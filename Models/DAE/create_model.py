@@ -53,8 +53,9 @@ def train(autoencoder, device, train_loader, es_loader, learning_rate):
         torch.cuda.empty_cache()
 
         train_loss /= 24017
+        train_loss = math.sqrt(train_loss)
         train_losses.append(train_loss)
-        print(f"Training loss: {train_loss}")
+        print(f"Training RMSE loss: {train_loss}")
         
         print("Early stop check...")
         # Early stopping loop
@@ -75,9 +76,10 @@ def train(autoencoder, device, train_loader, es_loader, learning_rate):
         torch.cuda.empty_cache()
 
         es_loss /= 6005
+        train_loss = math.sqrt(es_loss)
         es_losses.append(es_loss)
         early_stopping(es_loss, autoencoder)
-        print(f"Early stopping loss: {es_loss}")
+        print(f"Early RMSE stopping loss: {es_loss}")
 
         if early_stopping.early_stop:
             print(f"Early stopping at epoch {epoch+1}.")
