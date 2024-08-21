@@ -3,7 +3,7 @@ sys.path.append('/vol/bitbucket/rs218/MSc-Project')
 
 from torch.utils.data import DataLoader
 from Models.datasets import FE_Dataset
-from deepDAE import DeepSDAE
+from deepDAE import DeepDAE
 from Models.early_stop import EarlyStoppingAE
 import torch.nn as nn
 import torch.optim as optim
@@ -132,7 +132,7 @@ def full_train(trial, train_set, es_set, val_set, gene_order, DAE_type):
     val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=True, num_workers=1)
 
     # Create the autoencoder
-    autoencoder = DeepSDAE(noise_factor, noise_type, dropout_rate, device, gene_order, pathway_proportion, split=True)
+    autoencoder = DeepDAE(noise_factor, noise_type, dropout_rate, device, gene_order, pathway_proportion, split=True)
 
     # Train the autoencoder
     print("Training...")

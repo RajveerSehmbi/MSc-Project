@@ -129,9 +129,9 @@ class Decoder(nn.Module):
 
 
 
-class DeepSDAE(nn.Module):
+class DeepDAE(nn.Module):
 
-    def __init__(self, noiserate, noise_type, dropout_factor, device, input_order, pathway_proportion, split=False):
+    def __init__(self, noiserate, noise_type, dropout_factor, device, input_order, pathway_proportion=0.1, split=False):
         super().__init__()
 
         self.noiserate = noiserate

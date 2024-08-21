@@ -3,7 +3,7 @@ sys.path.append('/vol/bitbucket/rs218/MSc-Project')
 
 from torch.utils.data import DataLoader
 from Models.datasets import FE_Dataset
-from deepDAE import DeepSDAE
+from deepDAE import DeepDAE
 from Models.early_stop import EarlyStoppingAE
 import torch.nn as nn
 import torch.optim as optim
@@ -112,7 +112,7 @@ def calculate_val_loss(autoencoder, device, val_loader):
 
 
 
-def full_train(train_set, es_set, val_set, test_set):
+def full_train(train_set, es_set, val_set, test_set, gene_order):
 
     # Hyperparameters
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -128,7 +128,7 @@ def full_train(train_set, es_set, val_set, test_set):
     test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=1)
 
     # Create the autoencoder
-    autoencoder = DeepSDAE(noise_factor, noise_type, dropout_rate, device, split=True)
+    autoencoder = DeepDAE(noise_factor, noise_type, dropout_rate, device, split=True)
 
     # Train the autoencoder
     print("Training...")
@@ -167,6 +167,12 @@ def full_train(train_set, es_set, val_set, test_set):
  # Main function
 def main():
 
+    gene_order = pd.read_csv(f'{variables.gene_order_file}')
+    gene_order = gene_order['0']
+    gene_order = [gene.split('.')[0] for gene in gene_order]
+
+    print("Gene order loaded")
+
     print("Loading data...")
 
     # Load the data
@@ -176,7 +182,7 @@ def main():
     test_set = FE_Dataset('test')
     print("Data loaded.")
 
-    full_train(train_set, es_set, val_set, test_set)
+    full_train(train_set, es_set, val_set, test_set, gene_order)
     print("Training complete.")
 
 
