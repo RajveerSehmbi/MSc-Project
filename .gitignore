@@ -3,6 +3,7 @@
 *.pkl
 *.pt
 *.out
+*.err
 
 # MACOS
 .DS_Store
