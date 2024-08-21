@@ -32,7 +32,8 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
     # Cross entropy loss
     loss_function = nn.CrossEntropyLoss()
     # Optimizer
-    optimizer = optim.Adam(classifier.parameters(), lr=learning_rate)
+    optimizer1 = optim.Adam(classifier.layer1.parameters(), lr=learning_rate)
+    optimizer2 = optim.Adam(classifier.layer2.parameters(), lr=learning_rate)
     # Early stopping
     early_stopping = EarlyStoppingAE(patience=10, delta=0.005)
 
@@ -58,9 +59,11 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
             loss = loss_function(outputs, y)
             train_loss += loss.item() * batch_size
 
-            optimizer.zero_grad()
+            optimizer1.zero_grad()
+            optimizer2.zero_grad()
             loss.backward()
-            optimizer.step()
+            optimizer1.step()
+            optimizer2.step()
 
         train_loss /= 24017
         train_losses.append(train_loss)
@@ -99,7 +102,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
 
 
     
-    del loss_function, optimizer, early_stopping, train_loss, es_loss
+    del loss_function, optimizer1, optimizer2, early_stopping, train_loss, es_loss
     gc.collect()
 
     return classifier, train_losses, val_losses
@@ -258,7 +261,7 @@ def evaluate_on_test(parameters):
                 dropout factor: {dropout_factor} \
                 learning rate: {learning_rate}")
 
-        classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
+        classifier = BaseClassifier(input_dim, hidden_dim, dropout_factor)
         classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt"))
 
         test_ds = FE_Dataset('test')
