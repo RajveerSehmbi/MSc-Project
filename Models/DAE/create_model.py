@@ -112,19 +112,20 @@ def calculate_val_loss(autoencoder, device, val_loader):
 
 
 
-def full_train(train_set, es_set, val_set):
+def full_train(train_set, es_set, val_set, test_set):
 
     # Hyperparameters
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     noise_type = 'gaussian'
-    noise_factor = 0.5
-    dropout_rate = 0.5
-    batch_size = 32
-    learning_rate = 0.002
+    noise_factor = 0.1
+    dropout_rate = 0.1
+    batch_size = 128
+    learning_rate = 0.000369
 
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=3)
     es_loader = DataLoader(es_set, batch_size=batch_size, shuffle=True, num_workers=2)
     val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=True, num_workers=1)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=1)
 
     # Create the autoencoder
     autoencoder = DeepSDAE(noise_factor, noise_type, dropout_rate, device, split=True)
@@ -138,6 +139,9 @@ def full_train(train_set, es_set, val_set):
     val_loss = calculate_val_loss(autoencoder, device, val_loader)
     print(f"Validation RMSE loss: {val_loss}")
 
+    test_loss = calculate_val_loss(autoencoder, device, test_loader)
+    print(f"Test RMSE loss: {test_loss}")
+
     # Save the model
     torch.save(autoencoder.state_dict(), f"{variables.DAE_model_path}/{variables.DAE_type}_model.pt")
     print("Model saved.")
@@ -146,9 +150,13 @@ def full_train(train_set, es_set, val_set):
     gc.collect()
     torch.cuda.empty_cache()
 
+    # Save validation and test losses
+    losses = pd.DataFrame({'val': val_loss, 'test': test_loss}, index=[0])
+    losses.to_csv(f"{variables.DAE_model_path}/{variables.DAE_type}_model_final_losses.csv")
+
     # Put the losses in a dataframe and save them to a file
     losses = pd.DataFrame({'train': train_losses, 'es': es_losses})
-    losses.to_csv("/vol/bitbucket/rs218/SDAE/losses/final_losses.csv")
+    losses.to_csv("{variables.DAE_model_path}/{variables.DAE_type}_model_train_losses.csv")
     print("Losses saved.")
 
     del losses, train_losses, es_losses
@@ -163,11 +171,12 @@ def main():
 
     # Load the data
     train_set = FE_Dataset('train')
-    es_set = FE_Dataset('s')
+    es_set = FE_Dataset('es')
     val_set = FE_Dataset('val')
+    test_set = FE_Dataset('test')
     print("Data loaded.")
 
-    full_train(train_set, es_set, val_set)
+    full_train(train_set, es_set, val_set, test_set)
     print("Training complete.")
 
 
