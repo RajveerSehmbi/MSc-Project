@@ -158,7 +158,7 @@ def full_train(train_set, es_set, val_set, test_set, gene_order):
 
     # Put the losses in a dataframe and save them to a file
     losses = pd.DataFrame({'train': train_losses, 'es': es_losses})
-    losses.to_csv("{variables.DAE_model_path}/{variables.DAE_type}_model_train_losses.csv")
+    losses.to_csv(f"{variables.DAE_model_path}/{variables.DAE_type}_model_train_losses.csv")
     print("Losses saved.")
 
     del losses, train_losses, es_losses
