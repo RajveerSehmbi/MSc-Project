@@ -27,7 +27,7 @@ print("Imported libraries")
 # Trains a classifier using the given hyperparameters
 # Includes early stopping
 # Returns the trained classifier and the training and validation losses
-def train_classifier(classifier, train_loader, es_loader, learning_rate):
+def train_classifier(classifier, train_loader, es_loader, learning_rate, device):
      
     # Cross entropy loss
     loss_function = nn.CrossEntropyLoss()
@@ -51,6 +51,9 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate):
         for X, y in train_loader:
             batch_size = X.size(0)
 
+            X = X.to(device)
+            y = y.to(device)
+
             outputs = classifier(X)
             loss = loss_function(outputs, y)
             train_loss += loss.item() * batch_size
@@ -73,6 +76,9 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate):
             with torch.no_grad():
 
                 batch_size = X.size(0)
+
+                X = X.to(device)
+                y = y.to(device)
 
                 outputs = classifier(X)
                 loss = loss_function(outputs, y)
@@ -103,7 +109,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate):
 # Function
 # Calculates the balanced accuracy of the classifier on the given dataset
 # Returns the balanced accuracy
-def calculate_accuracy(classifier, loader):
+def calculate_accuracy(classifier, loader, device):
 
     # Create true labels
     true_labels = []
@@ -116,6 +122,9 @@ def calculate_accuracy(classifier, loader):
         with torch.no_grad():
             
             true_labels.extend(y.numpy().tolist())
+
+            X = X.to(device)
+            y = y.to(device)
 
             outputs = classifier(X)
             _, predicted = torch.max(outputs, 1)
@@ -146,6 +155,7 @@ def hyperparameter_search():
     batch_sizes = [512, 256, 128, 64, 32, 16]
     dropout_factors = [0.2, 0.3, 0.4, 0.5]
     learning_rates = [0.01, 0.001, 0.0001]
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     # Store the best hyperparameters
     best_hyperparameters = {variables.gene_number: None}
@@ -178,15 +188,15 @@ def hyperparameter_search():
                             dropout factor: {dropout_factor} \
                             learning rate: {learning_rate}")
 
-                    classifier = Classifier(input_dim, hidden_dim, dropout_factor)
+                    classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
                     print("Classifier created.")
 
                     # Train the classifier
-                    classifier, train_losses, es_losses = train_classifier(classifier, train_loader, es_loader, learning_rate)
+                    classifier, train_losses, es_losses = train_classifier(classifier, train_loader, es_loader, learning_rate, device)
                     print("Classifier trained.")
 
                     # Calculate the validation loss
-                    accuracy = calculate_accuracy(classifier, val_loader)
+                    accuracy = calculate_accuracy(classifier, val_loader, device)
                     print(f"Validation accuracy: {accuracy}")
 
                     # Save the best hyperparameters
@@ -233,6 +243,8 @@ def evaluate_on_test(parameters):
 
     test_accuracies = []
 
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
     for index, row in parameters.iterrows():
         input_dim = row['input_dim']
         hidden_dim = row['hidden_dim']
@@ -246,13 +258,13 @@ def evaluate_on_test(parameters):
                 dropout factor: {dropout_factor} \
                 learning rate: {learning_rate}")
 
-        classifier = Classifier(input_dim, hidden_dim, dropout_factor)
+        classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
         classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt"))
 
         test_ds = FE_Dataset('test')
         test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=1)
 
-        accuracy = calculate_accuracy(classifier, test_loader)
+        accuracy = calculate_accuracy(classifier, test_loader, device)
         test_accuracies.append(accuracy)
 
         del classifier, accuracy
