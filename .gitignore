@@ -2,7 +2,7 @@
 *.db
 *.pkl
 *.pt
-
+*.out
 
 # MACOS
 .DS_Store

@@ -11,6 +11,6 @@ source activate
 source /vol/cuda/12.0.0/setup.sh
 uptime
 
-python3 /vol/bitbucket/rs218/Project/Models/DAE/create_model.py
+python3 /vol/bitbucket/rs218/MSc-Project/Models/DAE/create_model.py
 
 /usr/bin/nvidia-smi
