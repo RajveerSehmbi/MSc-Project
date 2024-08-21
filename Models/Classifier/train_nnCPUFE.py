@@ -155,13 +155,13 @@ def hyperparameter_search():
     train_loss_list = None
     es_loss_list = None
 
+    train_ds = FE_Dataset('trainPCAtransform')
+    es_ds = FE_Dataset('esPCAtransform')
+    val_ds = FE_Dataset('valPCAtransform')
+
     # Loop over the hyperparameters
     for input_dim, hidden_dim in dimensions.items():
         best_accuracy = 0.0
-
-        train_ds = FE_Dataset('trainPCAtransform')
-        es_ds = FE_Dataset('esPCAtransform')
-        val_ds = FE_Dataset('valPCAtransform')
 
         for batch_size in batch_sizes:
 
