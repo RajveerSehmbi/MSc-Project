@@ -1,5 +1,5 @@
 # GENERAL
-path = '/Users/raj/MSc-Project/MSc-Project'
+path = '/vol/bitbucket/rs218/MSc-Project'
 
 # DATA
 database_path = f'{path}/Data/SQLite/data_minmax.db'

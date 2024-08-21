@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/vol/bitbucket/rs218/Project')
+sys.path.append('/vol/bitbucket/rs218/MSc-Project')
 
 from torch.utils.data import DataLoader
 from datasets import FE_Dataset

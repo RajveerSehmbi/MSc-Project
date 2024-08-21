@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/vol/bitbucket/rs218/Project')
+sys.path.append('/vol/bitbucket/rs218/MSc-Project')
 
 import joblib
 import optuna
