@@ -6,7 +6,7 @@ import optuna
 import variables
 
 if variables.DAE_type == 'standard':
-    study = joblib.load('deepSDAE_optuna.pkl')
+    study = joblib.load('deepSDAE_optuna_mm.pkl')
     df = study.trials_dataframe().drop(['state','datetime_start','datetime_complete'], axis=1)
 
     df.to_csv('deepSDAE_optuna.csv', index=False)

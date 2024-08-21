@@ -23,10 +23,10 @@ PCA_top_genes_file = f'{path}/PCA/top_512_genes.txt'
 
 
 # DAE
-DAE_type = 'pathway'
-optuna_path = f'{path}/DAE/Optuna'
-image_path = f'{path}/DAE/Plots'
-DAE_model_path = f'{path}/DAE/Trained'
+DAE_type = 'standard'
+optuna_path = f'{path}/Models/DAE/Optuna'
+image_path = f'{path}/Models/DAE/Plots'
+DAE_model_path = f'{path}/Models/DAE/Trained'
 
 # CLASSIFIER
 classifier_model_path = f'{path}/Models/Classifier/Trained'
