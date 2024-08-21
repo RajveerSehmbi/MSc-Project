@@ -1,7 +1,7 @@
 import sys
 sys.path.append('/vol/bitbucket/rs218/MSc-Project')
 
-from nn import Classifier
+from nn import BaseClassifier
 print("Imported Classifier")
 from Models.datasets import FE_Dataset
 print("Imported Dataset")
@@ -188,7 +188,7 @@ def hyperparameter_search():
                             dropout factor: {dropout_factor} \
                             learning rate: {learning_rate}")
 
-                    classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
+                    classifier = BaseClassifier(input_dim, hidden_dim, dropout_factor)
                     print("Classifier created.")
 
                     # Train the classifier
