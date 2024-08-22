@@ -194,6 +194,14 @@ def hyperparameter_search():
                     classifier = BaseClassifier(input_dim, hidden_dim, dropout_factor)
                     print("Classifier created.")
 
+                    torch.cuda.empty_cache()
+
+                    print(f"Memory allocated on GPU 0: {torch.cuda.memory_allocated(0)}")
+                    print(f"Memory allocated on GPU 1: {torch.cuda.memory_allocated(1)}")
+
+                    print(next(classifier.layer1.parameters()).device)  # Should print cuda:0
+                    print(next(classifier.layer2.parameters()).device) 
+
                     # Train the classifier
                     classifier, train_losses, es_losses = train_classifier(classifier, train_loader, es_loader, learning_rate, device)
                     print("Classifier trained.")
@@ -262,6 +270,15 @@ def evaluate_on_test(parameters):
                 learning rate: {learning_rate}")
 
         classifier = BaseClassifier(input_dim, hidden_dim, dropout_factor)
+
+        torch.cuda.empty_cache()
+
+        print(f"Memory allocated on GPU 0: {torch.cuda.memory_allocated(0)}")
+        print(f"Memory allocated on GPU 1: {torch.cuda.memory_allocated(1)}")
+
+        print(next(classifier.layer1.parameters()).device)  # Should print cuda:0
+        print(next(classifier.layer2.parameters()).device) 
+
         classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt"))
 
         test_ds = FE_Dataset('test')
