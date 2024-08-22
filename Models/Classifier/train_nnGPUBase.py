@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import gc
-from Models.early_stop import EarlyStoppingAE
+from Models.early_stop import EarlyStoppingBase
 import pandas as pd
 import numpy as np
 from sklearn.metrics import balanced_accuracy_score
@@ -34,7 +34,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
     # Optimizer
     optimizer= optim.SGD(classifier.parameters(), lr=learning_rate)
     # Early stopping
-    early_stopping = EarlyStoppingAE(patience=10, delta=0.005)
+    early_stopping = EarlyStoppingBase(patience=10, delta=0.005)
 
     # Keep losses
     train_losses = []
@@ -93,14 +93,24 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
 
         if early_stopping.early_stop:
             print(f"Early stopping at epoch {epoch + 1}")
+            del classifier
+            gc.collect()
+            torch.cuda.empty_cache()
+
             # Load the best model
-            early_stopping.load_best_weights(classifier)
-            break
+            classifier = early_stopping.load_best_weights()
+            classifier.to(device)
+
+            del loss_function, optimizer, early_stopping, train_loss, es_loss
+            gc.collect()
+            torch.cuda.empty_cache()
+            
+            return classifier, train_losses, val_losses
 
 
-    
     del loss_function, optimizer, early_stopping, train_loss, es_loss
     gc.collect()
+    torch.cuda.empty_cache()
 
     return classifier, train_losses, val_losses
 
@@ -152,9 +162,9 @@ def hyperparameter_search():
     
     # Hyperparameters
     dimensions = {variables.gene_number: (variables.gene_number // 2)}
-    batch_sizes = [512, 256, 128, 64, 32, 16]
+    batch_sizes = [512, 256, 128, 64]
     dropout_factors = [0.2, 0.3, 0.4, 0.5]
-    learning_rates = [0.01, 0.001, 0.0001]
+    learning_rates = [0.01, 0.001]
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     # Store the best hyperparameters
@@ -207,11 +217,12 @@ def hyperparameter_search():
                         train_loss_list = train_losses
                         es_loss_list = es_losses
                         # Save the model
-                        torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt")
+                        torch.save(classifier, f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt")
                         print("Model saved.")
 
                     del classifier, train_losses, es_losses, accuracy
                     gc.collect()
+                    torch.cuda.empty_cache()
 
                     print(f"Best Validation accuracy: {best_accuracy}")
 
@@ -257,10 +268,12 @@ def evaluate_on_test(parameters):
                 batch size: {batch_size}, \
                 dropout factor: {dropout_factor} \
                 learning rate: {learning_rate}")
+        
+        classifier = torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt").to(device)
 
-        classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
+        # classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
 
-        classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt"))
+        # classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt"))
 
         test_ds = FE_Dataset('test')
         test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=1)
