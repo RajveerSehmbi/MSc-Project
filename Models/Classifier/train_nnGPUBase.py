@@ -1,7 +1,7 @@
 import sys
 sys.path.append('/vol/bitbucket/rs218/MSc-Project')
 
-from nn import BaseClassifier
+from nn import Classifier
 print("Imported Classifier")
 from Models.datasets import FE_Dataset
 print("Imported Dataset")
@@ -32,8 +32,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
     # Cross entropy loss
     loss_function = nn.CrossEntropyLoss()
     # Optimizer
-    optimizer1 = optim.Adam(classifier.layer1.parameters(), lr=learning_rate)
-    optimizer2 = optim.Adam(classifier.layer2.parameters(), lr=learning_rate)
+    optimizer= optim.SGD(classifier.parameters(), lr=learning_rate)
     # Early stopping
     early_stopping = EarlyStoppingAE(patience=10, delta=0.005)
 
@@ -59,11 +58,9 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
             loss = loss_function(outputs, y)
             train_loss += loss.item() * batch_size
 
-            optimizer1.zero_grad()
-            optimizer2.zero_grad()
+            optimizer.zero_grad()
             loss.backward()
-            optimizer1.step()
-            optimizer2.step()
+            optimizer.step()
 
         train_loss /= 24017
         train_losses.append(train_loss)
@@ -102,7 +99,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
 
 
     
-    del loss_function, optimizer1, optimizer2, early_stopping, train_loss, es_loss
+    del loss_function, optimizer, early_stopping, train_loss, es_loss
     gc.collect()
 
     return classifier, train_losses, val_losses
@@ -191,16 +188,8 @@ def hyperparameter_search():
                             dropout factor: {dropout_factor} \
                             learning rate: {learning_rate}")
 
-                    classifier = BaseClassifier(input_dim, hidden_dim, dropout_factor)
+                    classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
                     print("Classifier created.")
-
-                    torch.cuda.empty_cache()
-
-                    print(f"Memory allocated on GPU 0: {torch.cuda.memory_allocated(0)}")
-                    print(f"Memory allocated on GPU 1: {torch.cuda.memory_allocated(1)}")
-
-                    print(next(classifier.layer1.parameters()).device)  # Should print cuda:0
-                    print(next(classifier.layer2.parameters()).device) 
 
                     # Train the classifier
                     classifier, train_losses, es_losses = train_classifier(classifier, train_loader, es_loader, learning_rate, device)
@@ -269,15 +258,7 @@ def evaluate_on_test(parameters):
                 dropout factor: {dropout_factor} \
                 learning rate: {learning_rate}")
 
-        classifier = BaseClassifier(input_dim, hidden_dim, dropout_factor)
-
-        torch.cuda.empty_cache()
-
-        print(f"Memory allocated on GPU 0: {torch.cuda.memory_allocated(0)}")
-        print(f"Memory allocated on GPU 1: {torch.cuda.memory_allocated(1)}")
-
-        print(next(classifier.layer1.parameters()).device)  # Should print cuda:0
-        print(next(classifier.layer2.parameters()).device) 
+        classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
 
         classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt"))
 
