@@ -142,7 +142,7 @@ def hyperparameter_search():
     print("Starting hyperparameter search...")
     
     # Hyperparameters
-    dimensions = {variables.PCA_components: (variables.PCA_components // 2)}
+    dimensions = {variables.PCA_components: variables.pathway_num}
     batch_sizes = [512, 256, 128, 64, 32, 16]
     dropout_factors = [0.2, 0.3, 0.4, 0.5]
     learning_rates = [0.01, 0.001, 0.0001]
@@ -197,7 +197,7 @@ def hyperparameter_search():
                         train_loss_list = train_losses
                         es_loss_list = es_losses
                         # Save the model
-                        torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/PCAFEclassifier_{input_dim}_{hidden_dim}.pt")
+                        torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/PwPCAFEclassifier_{input_dim}_{hidden_dim}.pt")
                         print("Model saved.")
 
                     del classifier, train_losses, es_losses, accuracy
@@ -207,7 +207,7 @@ def hyperparameter_search():
 
         # Create a data frame of the losses
         losses = pd.DataFrame({'train_loss': train_loss_list, 'es_loss': es_loss_list})
-        losses.to_csv(f"{variables.classifier_model_path}/PCAFElosses_{input_dim}_{hidden_dim}.csv")
+        losses.to_csv(f"{variables.classifier_model_path}/PwPCAFElosses_{input_dim}_{hidden_dim}.csv")
 
         del losses
         gc.collect()
@@ -247,7 +247,7 @@ def evaluate_on_test(parameters):
                 learning rate: {learning_rate}")
 
         classifier = Classifier(input_dim, hidden_dim, dropout_factor)
-        classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/PCAFEclassifier_{input_dim}_{hidden_dim}.pt"))
+        classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/PwPCAFEclassifier_{input_dim}_{hidden_dim}.pt"))
 
         test_ds = FE_Dataset('testPCAtransform')
         test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=1)
@@ -259,7 +259,7 @@ def evaluate_on_test(parameters):
         gc.collect()
 
     parameters['test_accuracy'] = test_accuracies
-    parameters.to_csv(f"{variables.classifier_model_path}/PCAFEclassifier_info.csv")
+    parameters.to_csv(f"{variables.classifier_model_path}/PwPCAFEclassifier_info.csv")
 
 
 

@@ -11,6 +11,7 @@ cancer_map = {"LAML": 0, "ACC": 1, "CHOL": 2, "BLCA": 3, "BRCA": 4, "CESC": 5, "
 gene_number = 58038
 pathway_file = f'{path}/Data/Pathways/pathway_genes.csv'
 gene_order_file = f'{path}/Data/input_order.csv'
+pathway_num = 127
 
 
 # EARLY STOPPING
