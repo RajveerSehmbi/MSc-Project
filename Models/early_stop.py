@@ -20,7 +20,7 @@ class EarlyStoppingAE:
 
         if self.best_score is None:
             self.best_score = score
-            torch.save(model.state_dict(), f"{variables.es_path}/deepdae_{model.noiserate}_{model.noise_type}_{model.dropout_factor}.pt")
+            torch.save(model.state_dict(), f"{variables.es_path}/model.pt")
         elif score > self.best_score - self.delta:
             self.counter += 1
             if self.counter >= self.patience:
@@ -28,13 +28,13 @@ class EarlyStoppingAE:
         else:
             self.best_score = score
             # Save the model weights in a file
-            torch.save(model.state_dict(), f"{variables.es_path}/deepdae_{model.noiserate}_{model.noise_type}_{model.dropout_factor}.pt")
+            torch.save(model.state_dict(), f"{variables.es_path}/model.pt")
             self.counter = 0
 
     def load_best_weights(self, model):
-        model.load_state_dict(torch.load(f"{variables.es_path}/deepdae_{model.noiserate}_{model.noise_type}_{model.dropout_factor}.pt"))
+        model.load_state_dict(torch.load(f"{variables.es_path}/model.pt"))
         # Delete the file
-        os.remove(f"{variables.es_path}/deepdae_{model.noiserate}_{model.noise_type}_{model.dropout_factor}.pt")
+        os.remove(f"{variables.es_path}/model.pt")
 
 
 
