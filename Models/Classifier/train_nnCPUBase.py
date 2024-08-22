@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import gc
-from Models.early_stop import EarlyStoppingBase
+from Models.early_stop import EarlyStoppingClassifier
 import pandas as pd
 import numpy as np
 from sklearn.metrics import balanced_accuracy_score
@@ -27,14 +27,14 @@ print("Imported libraries")
 # Trains a classifier using the given hyperparameters
 # Includes early stopping
 # Returns the trained classifier and the training and validation losses
-def train_classifier(classifier, train_loader, es_loader, learning_rate, device):
+def train_classifier(classifier, train_loader, es_loader, learning_rate):
      
     # Cross entropy loss
     loss_function = nn.CrossEntropyLoss()
     # Optimizer
-    optimizer= optim.SGD(classifier.parameters(), lr=learning_rate)
+    optimizer = optim.Adam(classifier.parameters(), lr=learning_rate)
     # Early stopping
-    early_stopping = EarlyStoppingBase(patience=10, delta=0.005)
+    early_stopping = EarlyStoppingClassifier(patience=10, delta=0.005)
 
     # Keep losses
     train_losses = []
@@ -50,9 +50,6 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
         classifier.train()
         for X, y in train_loader:
             batch_size = X.size(0)
-
-            X = X.to(device)
-            y = y.to(device)
 
             outputs = classifier(X)
             loss = loss_function(outputs, y)
@@ -77,9 +74,6 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
 
                 batch_size = X.size(0)
 
-                X = X.to(device)
-                y = y.to(device)
-
                 outputs = classifier(X)
                 loss = loss_function(outputs, y)
                 es_loss += loss.item() * batch_size
@@ -93,24 +87,14 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
 
         if early_stopping.early_stop:
             print(f"Early stopping at epoch {epoch + 1}")
-            del classifier
-            gc.collect()
-            torch.cuda.empty_cache()
-
             # Load the best model
-            classifier = early_stopping.load_best_weights()
-            classifier.to(device)
-
-            del loss_function, optimizer, early_stopping, train_loss, es_loss
-            gc.collect()
-            torch.cuda.empty_cache()
-            
-            return classifier, train_losses, val_losses
+            early_stopping.load_best_weights(classifier)
+            break
 
 
+    
     del loss_function, optimizer, early_stopping, train_loss, es_loss
     gc.collect()
-    torch.cuda.empty_cache()
 
     return classifier, train_losses, val_losses
 
@@ -119,7 +103,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, device)
 # Function
 # Calculates the balanced accuracy of the classifier on the given dataset
 # Returns the balanced accuracy
-def calculate_accuracy(classifier, loader, device):
+def calculate_accuracy(classifier, loader):
 
     # Create true labels
     true_labels = []
@@ -132,9 +116,6 @@ def calculate_accuracy(classifier, loader, device):
         with torch.no_grad():
             
             true_labels.extend(y.numpy().tolist())
-
-            X = X.to(device)
-            y = y.to(device)
 
             outputs = classifier(X)
             _, predicted = torch.max(outputs, 1)
@@ -161,11 +142,10 @@ def hyperparameter_search():
     print("Starting hyperparameter search...")
     
     # Hyperparameters
-    dimensions = {variables.gene_number: (variables.gene_number // 2)}
-    batch_sizes = [512, 256, 128, 64]
+    dimensions = {variables.gene_number: variables.pathway_num}
+    batch_sizes = [512, 256, 128, 64, 32, 16]
     dropout_factors = [0.2, 0.3, 0.4, 0.5]
-    learning_rates = [0.01, 0.001]
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    learning_rates = [0.01, 0.001, 0.0001]
 
     # Store the best hyperparameters
     best_hyperparameters = {variables.gene_number: None}
@@ -185,8 +165,8 @@ def hyperparameter_search():
 
         for batch_size in batch_sizes:
 
-            train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=3)
-            es_loader = DataLoader(es_ds, batch_size=batch_size, shuffle=True, num_workers=2)
+            train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
+            es_loader = DataLoader(es_ds, batch_size=batch_size, shuffle=True, num_workers=1)
             val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
 
             for dropout_factor in dropout_factors:
@@ -198,15 +178,15 @@ def hyperparameter_search():
                             dropout factor: {dropout_factor} \
                             learning rate: {learning_rate}")
 
-                    classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
+                    classifier = Classifier(input_dim, hidden_dim, dropout_factor)
                     print("Classifier created.")
 
                     # Train the classifier
-                    classifier, train_losses, es_losses = train_classifier(classifier, train_loader, es_loader, learning_rate, device)
+                    classifier, train_losses, es_losses = train_classifier(classifier, train_loader, es_loader, learning_rate)
                     print("Classifier trained.")
 
                     # Calculate the validation loss
-                    accuracy = calculate_accuracy(classifier, val_loader, device)
+                    accuracy = calculate_accuracy(classifier, val_loader)
                     print(f"Validation accuracy: {accuracy}")
 
                     # Save the best hyperparameters
@@ -217,18 +197,17 @@ def hyperparameter_search():
                         train_loss_list = train_losses
                         es_loss_list = es_losses
                         # Save the model
-                        torch.save(classifier, f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt")
+                        torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/PwBaseclassifier_{input_dim}_{hidden_dim}.pt")
                         print("Model saved.")
 
                     del classifier, train_losses, es_losses, accuracy
                     gc.collect()
-                    torch.cuda.empty_cache()
 
                     print(f"Best Validation accuracy: {best_accuracy}")
 
         # Create a data frame of the losses
         losses = pd.DataFrame({'train_loss': train_loss_list, 'es_loss': es_loss_list})
-        losses.to_csv(f"{variables.classifier_model_path}/Baselosses_{input_dim}_{hidden_dim}.csv")
+        losses.to_csv(f"{variables.classifier_model_path}/PwBaselosses_{input_dim}_{hidden_dim}.csv")
 
         del losses
         gc.collect()
@@ -254,8 +233,6 @@ def evaluate_on_test(parameters):
 
     test_accuracies = []
 
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
     for index, row in parameters.iterrows():
         input_dim = row['input_dim']
         hidden_dim = row['hidden_dim']
@@ -268,24 +245,21 @@ def evaluate_on_test(parameters):
                 batch size: {batch_size}, \
                 dropout factor: {dropout_factor} \
                 learning rate: {learning_rate}")
-        
-        classifier = torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt").to(device)
 
-        # classifier = Classifier(input_dim, hidden_dim, dropout_factor).to(device)
-
-        # classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/Baseclassifier_{input_dim}_{hidden_dim}.pt"))
+        classifier = Classifier(input_dim, hidden_dim, dropout_factor)
+        classifier.load_state_dict(torch.load(f"{variables.classifier_model_path}/PwBaseclassifier_{input_dim}_{hidden_dim}.pt"))
 
         test_ds = FE_Dataset('test')
         test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=1)
 
-        accuracy = calculate_accuracy(classifier, test_loader, device)
+        accuracy = calculate_accuracy(classifier, test_loader)
         test_accuracies.append(accuracy)
 
         del classifier, accuracy
         gc.collect()
 
     parameters['test_accuracy'] = test_accuracies
-    parameters.to_csv(f"{variables.classifier_model_path}/Baseclassifier_info.csv")
+    parameters.to_csv(f"{variables.classifier_model_path}/PwBaseclassifier_info.csv")
 
 
 

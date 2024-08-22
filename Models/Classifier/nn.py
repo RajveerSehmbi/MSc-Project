@@ -31,40 +31,40 @@ class Classifier(nn.Module):
         return x
     
 
-class BaseClassifier(nn.Module):
+# class BaseClassifier(nn.Module):
 
-    def __init__(self, input_dim, hidden_dim, dropout_factor):
+#     def __init__(self, input_dim, hidden_dim, dropout_factor):
 
-        super().__init__()
+#         super().__init__()
 
-        self.layer1 = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.ReLU()
-        )
+#         self.layer1 = nn.Sequential(
+#             nn.Linear(input_dim, hidden_dim),
+#             nn.ReLU()
+#         )
 
-        self.layer2 = nn.Sequential(
-            nn.Dropout(dropout_factor),
-            nn.Linear(hidden_dim, 34)
-        )
+#         self.layer2 = nn.Sequential(
+#             nn.Dropout(dropout_factor),
+#             nn.Linear(hidden_dim, 34)
+#         )
 
-        self.output = nn.Softmax(dim=1)
+#         self.output = nn.Softmax(dim=1)
 
-        # Initialize weights
-        nn.init.xavier_uniform_(self.layer1[0].weight)
-        nn.init.zeros_(self.layer1[0].bias)
-        nn.init.xavier_uniform_(self.layer2[1].weight)
-        nn.init.zeros_(self.layer2[1].bias)
+#         # Initialize weights
+#         nn.init.xavier_uniform_(self.layer1[0].weight)
+#         nn.init.zeros_(self.layer1[0].bias)
+#         nn.init.xavier_uniform_(self.layer2[1].weight)
+#         nn.init.zeros_(self.layer2[1].bias)
 
-        # Layers on separate GPUs
-        self.layer1.to('cuda:0')
-        self.layer2.to('cuda:1')
+#         # Layers on separate GPUs
+#         self.layer1.to('cuda:0')
+#         self.layer2.to('cuda:1')
 
-    def forward(self, x):
-        x = self.layer1(x)
-        x = x.to('cuda:1')
-        x = self.layer2(x)
-        x = x.to('cuda:0')
-        return x
+#     def forward(self, x):
+#         x = self.layer1(x)
+#         x = x.to('cuda:1')
+#         x = self.layer2(x)
+#         x = x.to('cuda:0')
+#         return x
 
 
 class DAEClassifier(nn.Module):

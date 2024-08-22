@@ -26,7 +26,7 @@ def train(autoencoder, device, train_loader, es_loader, learning_rate):
     # Optimizer
     optimizer = optim.Adam(autoencoder.parameters(), learning_rate)
     # Early stopping
-    early_stopping = EarlyStoppingAE(patience=10, delta=0.005)
+    early_stopping = EarlyStoppingAE(patience=10, delta=0.002)
 
     for epoch in range(5000):
         print(f"Epoch: {epoch + 1}")
@@ -119,13 +119,15 @@ def full_train(trial, train_set, es_set, val_set, gene_order, DAE_type):
     noise_type = None
     if DAE_type == 'standard':
         noise_type = trial.suggest_categorical('noise_type', ['gaussian', 'masking'])
+        pathway_proportion = 0.1 # Not used
     elif DAE_type == 'pathway':
         noise_type = 'pathway'
+        pathway_proportion = trial.suggest_float('pathway_proportion', 0.0, 1.0, step=0.1)
     noise_factor = trial.suggest_float('noise_factor', 0.1, 0.5, step=0.1)
     dropout_rate = trial.suggest_float('dropout_rate', 0.0, 0.5, step=0.1)
     batch_size = trial.suggest_categorical('batch_size', [16, 32, 64, 128, 256, 512])
     learning_rate = trial.suggest_float('learning_rate', 1e-4, 1e-2, log=True)
-    pathway_proportion = trial.suggest_float('pathway_proportion', 0.0, 1.0, step=0.1)
+    
 
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=3)
     es_loader = DataLoader(es_set, batch_size=batch_size, shuffle=True, num_workers=2)
