@@ -1,5 +1,6 @@
 # GENERAL
 path = '/vol/bitbucket/rs218/MSc-Project'
+#path = '/Users/raj/MSc-Project'
 
 # DATA
 database_path = f'{path}/Data/SQLite/data_scaled.db'
@@ -20,7 +21,7 @@ es_path = f'{path}/temp'
 
 # PCA
 PCA_model_path = f'{path}/PCA/pca_model_scaled.pkl'
-kPCA_model_path = f'{path}/PCA/pca_model_scaled.pkl'
+kPCA_model_path = f'{path}/PCA/kpca_model_scaled.pkl'
 PCA_components = 3506
 PCA_top_genes_file = f'{path}/PCA/top_512_genes.txt'
 
