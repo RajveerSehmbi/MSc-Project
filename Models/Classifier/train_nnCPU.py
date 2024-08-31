@@ -144,6 +144,7 @@ def full_train(trial, X, y, input_dim):
     for train_index, val_index in skf.split(X, y):
 
         print("New fold")
+        print(f"Train: {X[train_index].shape}, Val: {X[val_index].shape}")
 
         train_ds = Dataset(X[train_index], y[train_index])
         val_ds = Dataset(X[val_index], y[val_index])
@@ -198,6 +199,10 @@ if __name__ == "__main__":
     
     y = X['cancer_type']
     X = X.drop(columns=['cancer_type'])
+
+    print("Data read complete.")
+    print(X.shape)
+    print(y.shape)
 
     sampler = optuna.samplers.TPESampler()
       
