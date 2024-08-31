@@ -144,10 +144,10 @@ def full_train(trial, X, y, input_dim):
     for train_index, val_index in skf.split(X, y):
 
         print("New fold")
-        print(f"Train: {X[train_index].shape}, Val: {X[val_index].shape}")
+        print(f"Train: {X.iloc[train_index].shape}, Val: {X.iloc[val_index].shape}")
 
-        train_ds = Dataset(X[train_index], y[train_index])
-        val_ds = Dataset(X[val_index], y[val_index])
+        train_ds = Dataset(X.iloc[train_index], y.iloc[train_index])
+        val_ds = Dataset(X.iloc[val_index], y.iloc[val_index])
 
         train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
         val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
