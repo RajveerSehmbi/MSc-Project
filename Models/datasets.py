@@ -51,28 +51,11 @@ class FS_Dataset(Dataset):
 # FOR USE IN FEATURE EXTRACTION CLASSIFIERS
 class FE_Dataset(Dataset):
 
-    def __init__(self, table):
+    def __init__(self, X, y):
         self.cancer_types = variables.cancer_map
 
-        engine = create_engine(f"sqlite:///{variables.database_path}")
-
-        if table in ['train', 'val', 'test', 'es']:
-            self.table_num = 59
-        elif table in ['trainPCAtransform', 'valPCAtransform', 'testPCAtransform', 'esPCAtransform']:
-            self.table_num = 4
-
-        # Read the data from the table
-        self.data = pd.DataFrame()
-        for i in range(0, self.table_num):
-            table_name = f"{table}_{i}"
-            df = pd.read_sql(f"SELECT * FROM {table_name}", engine, index_col='row_num')
-            self.data = pd.concat([self.data, df], axis=1)
-            print(f"Read {table}_{i}")
-
-        self.labels = self.data['cancer_type']
-        self.data = self.data.drop(columns=['cancer_type'])
-
-        print("Dataset loaded with shape:", self.data.shape)
+        self.labels = y
+        self.data = X
 
 
     def __len__(self):

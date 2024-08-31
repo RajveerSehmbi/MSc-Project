@@ -4,7 +4,8 @@ sys.path.append('/vol/bitbucket/rs218/MSc-Project')
 from nn import Classifier
 print("Imported Classifier")
 
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
+from Models.datasets import FE_Dataset
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -146,8 +147,8 @@ def full_train(trial, X, y, input_dim):
         print("New fold")
         print(f"Train: {X.iloc[train_index].shape}, Val: {X.iloc[val_index].shape}")
 
-        train_ds = Dataset(X.iloc[train_index], y.iloc[train_index])
-        val_ds = Dataset(X.iloc[val_index], y.iloc[val_index])
+        train_ds = FE_Dataset(X.iloc[train_index], y.iloc[train_index])
+        val_ds = FE_Dataset(X.iloc[val_index], y.iloc[val_index])
 
         train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
         val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
