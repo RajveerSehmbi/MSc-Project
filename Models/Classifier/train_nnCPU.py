@@ -136,9 +136,6 @@ def full_train(trial, X, y, input_dim):
     # KFold
     skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
 
-    # Classifier
-    classifier = Classifier(input_dim, variables.pathway_num, dropout_factor)
-
     # Accuracies
     accuracies = []
 
@@ -152,6 +149,10 @@ def full_train(trial, X, y, input_dim):
 
         train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
         val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
+
+        # Create the classifier
+        # Classifier
+        classifier = Classifier(input_dim, variables.pathway_num, dropout_factor)
 
         # Train the classifier
         classifier = train_classifier(classifier, train_loader, val_loader, learning_rate, patience)
