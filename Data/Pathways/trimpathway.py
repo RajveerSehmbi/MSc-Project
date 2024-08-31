@@ -13,12 +13,14 @@ engine = create_engine(f"sqlite:///{variables.database_path}")
 pathway_genes = pd.read_csv(variables.pathway_file)
 
 # Read train data and keep columns
-train_columns = pd.DataFrame()
+train_columns = []
 for i in range(0, 46):
     table_name = f"train_{i}"
     df = pd.read_sql(f"SELECT * FROM {table_name}", engine, index_col='row_num')
+    # Keep only the column names
     df = df.columns
-    train_columns = pd.concat([train_columns, df], axis=0)
+    # Save list of ciolumn names
+    train_columns.extend(df)
     print(f"Read train_{i}")
 
 # Get the gene column from the pathway_genes.csv
