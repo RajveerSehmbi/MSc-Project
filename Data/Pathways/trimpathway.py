@@ -25,6 +25,9 @@ for i in range(0, 46):
     print(len(train_columns))
     print(f"Read train_{i}")
 
+# Keep everything up to the first dot in the column names
+train_columns = [x.split('.')[0] for x in train_columns]
+
 # Get the gene column from the pathway_genes.csv
 all_genes = pathway_genes['gene']
 print(all_genes.shape)
