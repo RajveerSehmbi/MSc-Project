@@ -206,7 +206,7 @@ if __name__ == "__main__":
 
     sampler = optuna.samplers.TPESampler()
       
-    study = optuna.create_study(sampler=sampler, direction='maximise')
+    study = optuna.create_study(sampler=sampler, direction='maximize')
     study.optimize(lambda trial: full_train(trial, X, y, input_dim), n_trials=10)
 
     joblib.dump(study, f'{variables.optuna_path_classifier}/classifier_optuna.pkl')
