@@ -139,9 +139,10 @@ def full_train(trial, X, y, input_dim):
     # Accuracies
     accuracies = []
 
+    count = 0
     for train_index, val_index in skf.split(X, y):
 
-        print("New fold")
+        print("New fold {count}")
         print(f"Train: {X.iloc[train_index].shape}, Val: {X.iloc[val_index].shape}")
 
         train_ds = FE_Dataset(X.iloc[train_index], y.iloc[train_index])
@@ -163,9 +164,12 @@ def full_train(trial, X, y, input_dim):
 
         print(f"Accuracy: {accuracy}")
 
+        count += 1
+
         del classifier, accuracy
         gc.collect()
     
+    print(f"Mean accuracy: {np.mean(accuracies)}")
     return np.mean(accuracies)
 
 
