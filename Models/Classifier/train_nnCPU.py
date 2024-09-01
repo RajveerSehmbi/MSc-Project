@@ -142,7 +142,7 @@ def full_train(trial, X, y, input_dim):
     count = 0
     for train_index, val_index in skf.split(X, y):
 
-        print("New fold {count}")
+        print(f"New fold {count}")
         print(f"Train: {X.iloc[train_index].shape}, Val: {X.iloc[val_index].shape}")
 
         train_ds = FE_Dataset(X.iloc[train_index], y.iloc[train_index])
@@ -179,12 +179,8 @@ def full_train(trial, X, y, input_dim):
 # ------------------------------------------------------------------------------ #
 # ------------------------------------------------------------------------------ #
 # Main code
+def main(table_name):
 
-if __name__ == "__main__":
-
-    # Read the inputs
-    table_name = sys.argv[1]
-    
     # Input dimension
     input_dim = None
     table_num = None
@@ -216,3 +212,13 @@ if __name__ == "__main__":
     study.optimize(lambda trial: full_train(trial, X, y, input_dim), n_trials=10)
 
     joblib.dump(study, f'{variables.optuna_path_classifier}/classifier_optuna.pkl')
+
+
+
+if __name__ == "__main__":
+
+    # Read the inputs
+    table_name = sys.argv[1]
+
+    main(table_name)
+    print("Optuna complete.")
