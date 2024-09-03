@@ -51,9 +51,6 @@ def train(autoencoder, device, train_loader, val_loader, learning_rate, patience
             loss.backward()
             optimizer.step()
 
-        gc.collect()
-        torch.cuda.empty_cache()
-
         train_loss /= train_loader.dataset.__len__()
         train_loss = math.sqrt(train_loss)
         print(f"Training RMSE loss: {train_loss}")
@@ -73,8 +70,6 @@ def train(autoencoder, device, train_loader, val_loader, learning_rate, patience
                 loss = loss_function(reconstructed, X)
                 es_loss += (loss.item() * batch_size)
 
-        gc.collect()
-        torch.cuda.empty_cache()
 
         es_loss /= val_loader.dataset.__len__()
         es_loss = math.sqrt(es_loss)
@@ -105,8 +100,6 @@ def calculate_val_loss(autoencoder, device, val_loader):
                 loss = loss_function(reconstructed, X)
                 val_loss += (loss.item() * batch_size)
 
-        gc.collect()
-        torch.cuda.empty_cache()
 
         val_loss /= val_loader.dataset.__len__()
         val_loss = math.sqrt(val_loss)
