@@ -36,6 +36,10 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
     # Early stopping
     early_stopping = EarlyStoppingClassifier(patience=patience, delta=0.005)
 
+    # Losses
+    train_losses = []
+    es_losses = []
+
 
     for epoch in range(5000):
 
@@ -57,6 +61,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
             optimizer.step()
 
         train_loss /= len(train_loader.dataset)
+        train_losses.append(train_loss)
 
         print(f"Training loss: {train_loss}")
 
@@ -77,6 +82,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
         
         es_loss /= len(es_loader.dataset)
         early_stopping(es_loss, classifier)
+        es_losses.append(es_loss)
         
         print(f"Early stopping loss: {es_loss}")
 
@@ -90,7 +96,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
     
     del loss_function, optimizer, early_stopping
 
-    return classifier
+    return classifier, train_losses, es_losses
 
 
 
@@ -116,6 +122,9 @@ def calculate_accuracy(classifier, loader):
             predicted = predicted.numpy()
             predictions.extend(predicted.tolist())
 
+    print(f"True labels: {true_labels}")
+    print(f"Predictions: {predictions}")
+
     balanced_accuracy = balanced_accuracy_score(true_labels, predictions)
 
     return balanced_accuracy
@@ -134,7 +143,7 @@ def three_fold_test(X, y, testX, testy, input_dim, params):
 
     # Test ds
     test_ds = FE_Dataset(testX, testy)
-    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=1)
+    test_loader = DataLoader(test_ds, batch_size=batch_size, num_workers=1)
 
     random_states = [42, 43, 44]
 
@@ -143,6 +152,9 @@ def three_fold_test(X, y, testX, testy, input_dim, params):
 
         # Split the data
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=random_states[i], stratify=y)
+
+        print(f"Train: {X_train.shape}, Val: {X_val.shape}")
+        print(f"Train: {y_train.shape}, Val: {y_val.shape}")
 
         train_ds = FE_Dataset(X_train, y_train)
         val_ds = FE_Dataset(X_val, y_val)
@@ -155,7 +167,7 @@ def three_fold_test(X, y, testX, testy, input_dim, params):
         classifier = Classifier(input_dim, variables.pathway_num, dropout_factor)
 
         # Train the classifier
-        classifier = train_classifier(classifier, train_loader, val_loader, learning_rate, patience)
+        classifier, tl, el = train_classifier(classifier, train_loader, val_loader, learning_rate, patience)
 
         # Calculate the validation loss
         accuracy = calculate_accuracy(classifier, test_loader)
@@ -163,7 +175,7 @@ def three_fold_test(X, y, testX, testy, input_dim, params):
 
         print(f"Accuracy: {accuracy}")
 
-        del classifier, accuracy
+        del classifier, accuracy, tl, el
         gc.collect()
 
     
@@ -201,7 +213,7 @@ def final_train(X, y, input_dim, params):
     classifier = Classifier(input_dim, variables.pathway_num, dropout_factor)
 
     # Train the classifier
-    classifier = train_classifier(classifier, train_loader, val_loader, learning_rate, patience)
+    classifier, train_losses, es_losses = train_classifier(classifier, train_loader, val_loader, learning_rate, patience)
 
     print("Classifier trained.")
 
@@ -209,6 +221,14 @@ def final_train(X, y, input_dim, params):
     torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/classifier_{input_dim}.pt")
 
     print("Model saved.")
+
+    # Save the losses
+    losses = pd.DataFrame({'train': train_losses, 'es': es_losses})
+    losses.to_csv(f"{variables.classifier_model_path}/classifier_losses_{input_dim}.csv")
+
+    print("Losses saved.")
+
+
 
 
 
