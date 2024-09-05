@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/Users/raj/MSc-Project')
+sys.path.append('/vol/bitbucket/rs218/MSc-Project')
 
 import joblib
 import matplotlib.pyplot as plt
