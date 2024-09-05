@@ -74,7 +74,7 @@ class Encoder(nn.Module):
                     while j <= i:
                         weights = self.layers[j-1][0].weight.T[indices]
                         indices = torch.argmax(weights, dim=1)
-                        indices = indices.to_device(self.device)
+                        indices = indices.to(self.device)
                         j += 1
                     x = self.perturb(x, indices)
             return x
