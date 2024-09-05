@@ -32,8 +32,6 @@ class Encoder(nn.Module):
 
         # List of input genes in order
         self.input_order = input_order
-        # For each gene, only keep everything up to the first dot
-        print(self.input_order)
 
 
     def forward(self, x):
@@ -64,7 +62,6 @@ class Encoder(nn.Module):
             
             # If i == 0, add noise to the first layer
             for pathway in pathways:
-                print([self.input_order.index(gene) for gene in self.pathways[self.pathways['pathway'] == pathway]['gene'].values[0]])
                 indices = [self.input_order.index(gene) for gene in self.pathways[self.pathways['pathway'] == pathway]['gene'].values[0]]
                 indices = torch.tensor(indices, dtype=torch.long)
 
