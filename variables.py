@@ -3,7 +3,7 @@ path = '/vol/bitbucket/rs218/MSc-Project'
 #path = '/Users/raj/MSc-Project'
 
 # DATA
-database_path = f'{path}/Data/SQLite/data_scaled.db'
+database_path = f'{path}/Data/SQLite/data_scaled2.db'
 
 cancer_map = {"LAML": 0, "ACC": 1, "CHOL": 2, "BLCA": 3, "BRCA": 4, "CESC": 5, "COAD": 6, "UCEC": 7, "ESCA": 8,
                 "GBM": 9, "HNSC": 10, "KICH": 11, "KIRC": 12, "KIRP": 13, "DLBC": 14, "LIHC": 15, "LGG": 16,
