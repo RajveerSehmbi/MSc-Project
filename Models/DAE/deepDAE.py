@@ -74,23 +74,23 @@ class Encoder(nn.Module):
                         indices = torch.argmax(weights, dim=1)
                         indices = indices.to(self.device)
                         j += 1
-                    x = self.perturb(x, indices)
-            return x
+                    perturbed_x = self.perturb(x, indices)
+            return perturbed_x
 
 
 
     def perturb(self, x, indices):
-        x = x.T
+        x_copy = x.clone().T
         modes = ['over', 'under', 'mask']
         random_mode = modes[torch.randint(0, 3, (1,)).item()]
 
         if random_mode == 'over':
-            x[indices] *= (1 + self.noiserate)
+            x_copy[indices] *= (1 + self.noiserate)
         elif random_mode == 'under':
-            x[indices] *= (1 - self.noiserate)
+            x_copy[indices] *= (1 - self.noiserate)
         elif random_mode == 'mask':
-            x[indices] = 0
-        return x.T
+            x_copy[indices] = 0
+        return x_copy.T
 
 
     
