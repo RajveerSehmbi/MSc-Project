@@ -27,7 +27,7 @@ PCA_top_genes_file = f'{path}/PCA/top_512_genes.txt'
 
 
 # DAE
-DAE_type = 'standard'
+DAE_type = 'pathway'
 optuna_path = f'{path}/Models/DAE/Optuna'
 image_path = f'{path}/Models/DAE/Plots'
 DAE_model_path = f'{path}/Models/DAE/Trained'

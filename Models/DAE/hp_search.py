@@ -141,6 +141,10 @@ def full_train(trial, train_set, val_set, gene_order, DAE_type):
     val_loss = calculate_val_loss(autoencoder, device, val_loader)
     print(f"Validation RMSE loss: {val_loss}")
 
+    del autoencoder, train_loader, val_loader
+    gc.collect()
+    torch.cuda.empty_cache()
+
     return val_loss
 
 
