@@ -60,13 +60,15 @@ class Encoder(nn.Module):
             # Randomly select a number of pathways to add noise to equal to self.pathway_noiseNum
             pathways = self.pathways['pathway'].sample(n=self.pathway_noiseNum, replace=False)
             
+            perturbed_x = None
+
             # If i == 0, add noise to the first layer
             for pathway in pathways:
                 indices = [self.input_order.index(gene) for gene in self.pathways[self.pathways['pathway'] == pathway]['gene'].values[0]]
                 indices = torch.tensor(indices, dtype=torch.long)
 
                 if i == 0:
-                    x = self.perturb(x, indices)
+                    perturbed_x = self.perturb(x, indices)
                 else:
                     j = 1
                     while j <= i:
