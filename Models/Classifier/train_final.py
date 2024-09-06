@@ -259,7 +259,7 @@ def main(table_name):
         input_dim = variables.gene_number
         table_num = 46
         test_table_name = 'test'
-        data_type = 'gene'
+        data_type = 'base'
 
 
     engine = create_engine(f"sqlite:///{variables.database_path}")

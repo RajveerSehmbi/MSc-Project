@@ -4,4 +4,4 @@ export PATH=/vol/bitbucket/rs218/fullenv/bin/:$PATH
 
 source activate
 
-python train_final.py trainKPCAtransform
+python train_final.py train
