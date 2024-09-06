@@ -1,2 +1,0 @@
-,input_dim,hidden_dim,best_batch_size,best_dropout_factor,best_learning_rate,val_accuracy,test_accuracy
-0,3506,127,128,0.4,0.01,0.9662847559695126,0.9489163578158939
