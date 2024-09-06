@@ -28,7 +28,7 @@ class Encoder(nn.Module):
         self.layer0 = self.generate_layer(input_dim, layer1_dim)
         self.layer1 = self.generate_layer(layer1_dim, layer2_dim)
         self.layer2 = self.generate_layer(layer2_dim, output_dim)
-        self.layers = [self.layer0, self.layer1, self.layer2]
+        self.layers = nn.ModuleList([self.layer0, self.layer1, self.layer2])
 
         # List of input genes in order
         self.input_order = input_order
@@ -60,7 +60,7 @@ class Encoder(nn.Module):
             # Randomly select a number of pathways to add noise to equal to self.pathway_noiseNum
             pathways = self.pathways['pathway'].sample(n=self.pathway_noiseNum, replace=False)
             
-            perturbed_x = None
+            perturbed_x = x.clone()
 
             # If i == 0, add noise to the first layer
             for pathway in pathways:
@@ -68,7 +68,7 @@ class Encoder(nn.Module):
                 indices = torch.tensor(indices, dtype=torch.long)
 
                 if i == 0:
-                    perturbed_x = self.perturb(x, indices)
+                    perturbed_x = self.perturb(perturbed_x, indices)
                 else:
                     j = 1
                     while j <= i:
@@ -76,7 +76,7 @@ class Encoder(nn.Module):
                         indices = torch.argmax(weights, dim=1)
                         indices = indices.to(self.device)
                         j += 1
-                    perturbed_x = self.perturb(x, indices)
+                    perturbed_x = self.perturb(perturbed_x, indices)
             return perturbed_x
 
 
