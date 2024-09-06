@@ -183,7 +183,7 @@ def three_fold_test(X, y, testX, testy, input_dim, params):
     return np.mean(accuracies)
 
 
-def final_train(X, y, input_dim, params):
+def final_train(X, y, input_dim, params, data_type):
 
     print("Final training...")
 
@@ -218,13 +218,13 @@ def final_train(X, y, input_dim, params):
     print("Classifier trained.")
 
     # Save the model
-    torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/classifier_{input_dim}.pt")
+    torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/classifier_{data_type}.pt")
 
     print("Model saved.")
 
     # Save the losses
     losses = pd.DataFrame({'train': train_losses, 'es': es_losses})
-    losses.to_csv(f"{variables.classifier_model_path}/classifier_losses_{input_dim}.csv")
+    losses.to_csv(f"{variables.classifier_model_path}/classifier_losses_{data_type}.csv")
 
     print("Losses saved.")
 
@@ -307,7 +307,7 @@ def main(table_name):
     print("Accuracy saved.")
 
     # Train the final model
-    final_train(X, y, input_dim, params)
+    final_train(X, y, input_dim, params, data_type)
 
     print("Final training complete.")
 
