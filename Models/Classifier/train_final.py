@@ -147,7 +147,12 @@ def three_fold_test(X, y, testX, testy, input_dim, params, device):
     test_ds.data = test_ds.data.to(device)
     test_ds.labels = test_ds.labels.to(device)
 
-    test_loader = DataLoader(test_ds, batch_size=batch_size, num_workers=1)
+    test_workers = 1
+
+    if device == torch.device('cuda:0'):
+        test_workers = 0
+
+    test_loader = DataLoader(test_ds, batch_size=batch_size, num_workers=test_workers)
 
     random_states = [42, 43, 44]
 
@@ -169,8 +174,15 @@ def three_fold_test(X, y, testX, testy, input_dim, params, device):
         train_ds.labels = train_ds.labels.to(device)
         val_ds.labels = val_ds.labels.to(device)
 
-        train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
-        val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
+        train_workers = 2
+        val_workers = 1
+
+        if device == torch.device('cuda:0'):
+            train_workers = 0
+            val_workers = 0
+
+        train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=train_workers)
+        val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=val_workers)
 
         # Create the classifier
         # Classifier
@@ -218,9 +230,16 @@ def final_train(X, y, input_dim, params, data_type, device):
     train_ds.labels = train_ds.labels.to(device)
     val_ds.labels = val_ds.labels.to(device)
 
+    train_workers = 2
+    val_workers = 1
+
+    if device == torch.device('cuda:0'):
+        train_workers = 0
+        val_workers = 0
+
     # Loaders
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=train_workers)
+    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=val_workers)
 
     print("Data put into loaders.")
 
