@@ -57,17 +57,20 @@ class FE_Dataset(Dataset):
         self.labels = y
         self.data = X
 
+        # Map labels to integers from cancer_types
+        self.labels.replace(self.cancer_types, inplace=True)
+
+
+        # Turn into tensors
+        self.data = torch.tensor(self.data, dtype=torch.float32)
+        self.labels = torch.tensor(self.labels, dtype=torch.long)
+
 
     def __len__(self):
         return self.data.shape[0]
 
     def __getitem__(self, idx):
-        X = self.data.iloc[idx]
-        X = X.to_numpy()
-        y = self.cancer_types[self.labels.iloc[idx]]
-
-        # Convert to tensor
-        X = torch.tensor(X, dtype=torch.float32)
-        y = torch.tensor(y, dtype=torch.long)
-
+        X = self.data[idx]
+        y = self.labels[idx]
+        
         return X, y

@@ -51,8 +51,6 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
         classifier.train()
         for X, y in train_loader:
             batch_size = X.size(0)
-            X = X.to(device)
-            y = y.to(device)
 
             outputs = classifier(X)
             loss = loss_function(outputs, y)
@@ -76,8 +74,6 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
             with torch.no_grad():
 
                 batch_size = X.size(0)
-                X = X.to(device)
-                y = y.to(device)
 
                 outputs = classifier(X)
                 loss = loss_function(outputs, y)
@@ -114,14 +110,12 @@ def calculate_accuracy(classifier, loader, device):
     predictions = []
 
     # Generate predictions
+    classifier.eval()
     for X, y in loader:
-        
-        classifier.eval()
+    
         with torch.no_grad():
-            
+            y = y.to('cpu')
             true_labels.extend(y.numpy().tolist())
-
-            X = X.to(device)
 
             outputs = classifier(X)
             outputs = outputs.to('cpu')
@@ -150,6 +144,9 @@ def three_fold_test(X, y, testX, testy, input_dim, params, device):
 
     # Test ds
     test_ds = FE_Dataset(testX, testy)
+    test_ds.data = test_ds.data.to(device)
+    test_ds.labels = test_ds.labels.to(device)
+
     test_loader = DataLoader(test_ds, batch_size=batch_size, num_workers=1)
 
     random_states = [42, 43, 44]
@@ -165,6 +162,12 @@ def three_fold_test(X, y, testX, testy, input_dim, params, device):
 
         train_ds = FE_Dataset(X_train, y_train)
         val_ds = FE_Dataset(X_val, y_val)
+
+        # Move data to device
+        train_ds.data = train_ds.data.to(device)
+        val_ds.data = val_ds.data.to(device)
+        train_ds.labels = train_ds.labels.to(device)
+        val_ds.labels = val_ds.labels.to(device)
 
         train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
         val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
@@ -208,6 +211,12 @@ def final_train(X, y, input_dim, params, data_type, device):
     # Datasets
     train_ds = FE_Dataset(trainX, trainy)
     val_ds = FE_Dataset(valX, valy)
+
+    # Move data to device
+    train_ds.data = train_ds.data.to(device)
+    val_ds.data = val_ds.data.to(device)
+    train_ds.labels = train_ds.labels.to(device)
+    val_ds.labels = val_ds.labels.to(device)
 
     # Loaders
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
