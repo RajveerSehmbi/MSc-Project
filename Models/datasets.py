@@ -60,6 +60,9 @@ class FE_Dataset(Dataset):
         # Map labels to integers from cancer_types
         self.labels.replace(self.cancer_types, inplace=True)
 
+        # Convert to numpy array
+        self.data = self.data.to_numpy()
+        self.labels = self.labels.to_numpy()
 
         # Turn into tensors
         self.data = torch.tensor(self.data, dtype=torch.float32)
