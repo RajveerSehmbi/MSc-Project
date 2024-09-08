@@ -137,7 +137,7 @@ def calculate_accuracy(classifier, loader, device):
     return balanced_accuracy
 
 
-def three_fold_test(X, y, testX, testy, input_dim, params, device):
+def three_fold_test(X, y, testX, testy, input_dim, params, data_type, device):
 
     # Hyperparameters
     batch_size = params['batch_size']
@@ -176,6 +176,18 @@ def three_fold_test(X, y, testX, testy, input_dim, params, device):
         # Train the classifier
         classifier, tl, el = train_classifier(classifier, train_loader, val_loader, learning_rate, patience, device)
 
+        if random_states[i] == 42:
+            # Save the model
+            torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/classifier_{data_type}.pt")
+
+            print("Model saved.")
+
+            # Save the losses
+            losses = pd.DataFrame({'train': tl, 'es': el})
+            losses.to_csv(f"{variables.classifier_model_path}/classifier_losses_{data_type}.csv")
+
+            print("Losses saved.")
+
         # Calculate the validation loss
         accuracy = calculate_accuracy(classifier, test_loader, device)
         accuracies.append(accuracy)
@@ -188,54 +200,6 @@ def three_fold_test(X, y, testX, testy, input_dim, params, device):
     
     print(f"Mean accuracy: {np.mean(accuracies)}")
     return np.mean(accuracies)
-
-
-def final_train(X, y, input_dim, params, data_type, device):
-
-    print("Final training...")
-
-    # Hyperparameters
-    batch_size = params['batch_size']
-    dropout_factor = params['dropout_factor']
-    learning_rate = params['learning_rate']
-    patience = params['patience']
-
-    # Split the data into training and validation sets
-    trainX, valX, trainy, valy = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-
-    print(f"Data split. Train: {trainX.shape}, Val: {valX.shape}")
-
-    # Datasets
-    train_ds = FE_Dataset(trainX, trainy)
-    val_ds = FE_Dataset(valX, valy)
-
-    # Loaders
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
-
-    print("Data put into loaders.")
-
-    # Create the classifier
-    # Classifier
-    classifier = Classifier(input_dim, variables.pathway_num, dropout_factor).to(device)
-
-    # Train the classifier
-    classifier, train_losses, es_losses = train_classifier(classifier, train_loader, val_loader, learning_rate, patience, device)
-
-    print("Classifier trained.")
-
-    # Save the model
-    torch.save(classifier.state_dict(), f"{variables.classifier_model_path}/classifier_{data_type}.pt")
-
-    print("Model saved.")
-
-    # Save the losses
-    losses = pd.DataFrame({'train': train_losses, 'es': es_losses})
-    losses.to_csv(f"{variables.classifier_model_path}/classifier_losses_{data_type}.csv")
-
-    print("Losses saved.")
-
-
 
 
 
@@ -307,7 +271,7 @@ def main(table_name):
     params = study.best_params
 
     # Final test value
-    accuracy = three_fold_test(X, y, testX, testy, input_dim, params, device)
+    accuracy = three_fold_test(X, y, testX, testy, input_dim, params, data_type, device)
 
     print(f"Final accuracy: {accuracy}")
     # Save accuracy in text file
@@ -315,11 +279,6 @@ def main(table_name):
         f.write(f"{accuracy}")
     
     print("Accuracy saved.")
-
-    # Train the final model
-    final_train(X, y, input_dim, params, data_type, device)
-
-    print("Final training complete.")
 
 
 
