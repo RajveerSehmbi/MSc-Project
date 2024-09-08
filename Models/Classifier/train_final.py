@@ -27,7 +27,7 @@ print("Imported libraries")
 # Trains a classifier using the given hyperparameters
 # Includes early stopping
 # Returns the trained classifier and the training and validation losses
-def train_classifier(classifier, train_loader, es_loader, learning_rate, patience):
+def train_classifier(classifier, train_loader, es_loader, learning_rate, patience, device):
      
     # Cross entropy loss
     loss_function = nn.CrossEntropyLoss()
@@ -51,6 +51,8 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
         classifier.train()
         for X, y in train_loader:
             batch_size = X.size(0)
+            X = X.to(device)
+            y = y.to(device)
 
             outputs = classifier(X)
             loss = loss_function(outputs, y)
@@ -74,6 +76,8 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
             with torch.no_grad():
 
                 batch_size = X.size(0)
+                X = X.to(device)
+                y = y.to(device)
 
                 outputs = classifier(X)
                 loss = loss_function(outputs, y)
@@ -103,7 +107,7 @@ def train_classifier(classifier, train_loader, es_loader, learning_rate, patienc
 # Function
 # Calculates the balanced accuracy of the classifier on the given dataset
 # Returns the balanced accuracy
-def calculate_accuracy(classifier, loader):
+def calculate_accuracy(classifier, loader, device):
 
     # Create true labels
     true_labels = []
@@ -117,7 +121,10 @@ def calculate_accuracy(classifier, loader):
             
             true_labels.extend(y.numpy().tolist())
 
+            X = X.to(device)
+
             outputs = classifier(X)
+            outputs = outputs.to('cpu')
             _, predicted = torch.max(outputs, 1)
             predicted = predicted.numpy()
             predictions.extend(predicted.tolist())
@@ -130,7 +137,7 @@ def calculate_accuracy(classifier, loader):
     return balanced_accuracy
 
 
-def three_fold_test(X, y, testX, testy, input_dim, params):
+def three_fold_test(X, y, testX, testy, input_dim, params, device):
 
     # Hyperparameters
     batch_size = params['batch_size']
@@ -164,13 +171,13 @@ def three_fold_test(X, y, testX, testy, input_dim, params):
 
         # Create the classifier
         # Classifier
-        classifier = Classifier(input_dim, variables.pathway_num, dropout_factor)
+        classifier = Classifier(input_dim, variables.pathway_num, dropout_factor).to(device)
 
         # Train the classifier
-        classifier, tl, el = train_classifier(classifier, train_loader, val_loader, learning_rate, patience)
+        classifier, tl, el = train_classifier(classifier, train_loader, val_loader, learning_rate, patience, device)
 
         # Calculate the validation loss
-        accuracy = calculate_accuracy(classifier, test_loader)
+        accuracy = calculate_accuracy(classifier, test_loader, device)
         accuracies.append(accuracy)
 
         print(f"Accuracy: {accuracy}")
@@ -183,7 +190,7 @@ def three_fold_test(X, y, testX, testy, input_dim, params):
     return np.mean(accuracies)
 
 
-def final_train(X, y, input_dim, params, data_type):
+def final_train(X, y, input_dim, params, data_type, device):
 
     print("Final training...")
 
@@ -210,10 +217,10 @@ def final_train(X, y, input_dim, params, data_type):
 
     # Create the classifier
     # Classifier
-    classifier = Classifier(input_dim, variables.pathway_num, dropout_factor)
+    classifier = Classifier(input_dim, variables.pathway_num, dropout_factor).to(device)
 
     # Train the classifier
-    classifier, train_losses, es_losses = train_classifier(classifier, train_loader, val_loader, learning_rate, patience)
+    classifier, train_losses, es_losses = train_classifier(classifier, train_loader, val_loader, learning_rate, patience, device)
 
     print("Classifier trained.")
 
@@ -261,8 +268,11 @@ def main(table_name):
         test_table_name = 'test'
         data_type = 'base'
 
-
+    # SQL database
     engine = create_engine(f"sqlite:///{variables.database_path}")
+
+    # Device
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     X = pd.DataFrame()
     for i in range(0, table_num):
@@ -297,7 +307,7 @@ def main(table_name):
     params = study.best_params
 
     # Final test value
-    accuracy = three_fold_test(X, y, testX, testy, input_dim, params)
+    accuracy = three_fold_test(X, y, testX, testy, input_dim, params, device)
 
     print(f"Final accuracy: {accuracy}")
     # Save accuracy in text file
@@ -307,7 +317,7 @@ def main(table_name):
     print("Accuracy saved.")
 
     # Train the final model
-    final_train(X, y, input_dim, params, data_type)
+    final_train(X, y, input_dim, params, data_type, device)
 
     print("Final training complete.")
 
