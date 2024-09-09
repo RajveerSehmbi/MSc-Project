@@ -125,8 +125,14 @@ def cross_val(X, y, gene_order, params):
 
         # Hyperparameters
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        noise_type = params['noise_type'][i]
-        pathway_proportion = params['pathway_proportion'][i]
+        noise_type = None
+        pathway_proportion = None
+        if variables.DAE_type == 'standard':
+            noise_type = params['noise_type'][i]
+            pathway_proportion = 0.1 # Not used in standard DAE
+        elif variables.DAE_type == 'pathway':
+            noise_type = 'pathway'
+            pathway_proportion = params['pathway_proportion'][i]
         noise_factor = params['noise_factor'][i]
         dropout_factor = params['dropout_factor'][i]
         batch_size = params['batch_size'][i]
