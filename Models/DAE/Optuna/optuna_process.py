@@ -6,7 +6,7 @@ import optuna
 import variables
 
 if variables.DAE_type == 'standard':
-    study = joblib.load('deepSDAE_optuna_mm.pkl')
+    study = joblib.load('deepDAE_optuna.pkl')
     df = study.trials_dataframe().drop(['state','datetime_start','datetime_complete'], axis=1)
 
     df.to_csv('deepSDAE_optuna.csv', index=False)
@@ -18,7 +18,7 @@ if variables.DAE_type == 'standard':
     optuna.visualization.plot_slice(study).write_image(f'{variables.image_path}/deepSDAE_optuna_slice.png')
 
 elif variables.DAE_type == 'pathway':
-    study = joblib.load('PWdeepSDAE_optuna.pkl')
+    study = joblib.load('PWdeepDAE_optuna.pkl')
     df = study.trials_dataframe().drop(['state','datetime_start','datetime_complete'], axis=1)
 
     df.to_csv('PWdeepSDAE_optuna.csv', index=False)
