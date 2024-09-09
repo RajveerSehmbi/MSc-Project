@@ -119,27 +119,27 @@ def calculate_val_loss(autoencoder, device, val_loader):
 def cross_val(X, y, gene_order, params):
 
     print(params)
-    
+
     # Accuracies
     cv_accuracies = []
 
     for i in range(0, 3):
 
-        # Hyperparameters
+        # Hyperparameters, taken from params dataframe for the ith row
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         noise_type = None
         pathway_proportion = None
         if variables.DAE_type == 'standard':
-            noise_type = params['noise_type'][i]
+            noise_type = params['noise_type'].iloc[i]
             pathway_proportion = 0.1 # Not used in standard DAE
         elif variables.DAE_type == 'pathway':
             noise_type = 'pathway'
-            pathway_proportion = params['pathway_proportion'][i]
-        noise_factor = params['noise_factor'][i]
-        dropout_factor = params['dropout_factor'][i]
-        batch_size = params['batch_size'][i]
-        learning_rate = params['learning_rate'][i]
-        patience = params['patience'][i]
+            pathway_proportion = params['pathway_proportion'].iloc[i]
+        noise_factor = params['noise_factor'].iloc[i]
+        dropout_factor = params['dropout_factor'].iloc[i]
+        batch_size = params['batch_size'].iloc[i]
+        learning_rate = params['learning_rate'].iloc[i]
+        patience = params['patience'].iloc[i]
 
         # Accuracies
         accuracies = []
