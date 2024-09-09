@@ -160,7 +160,7 @@ def cross_val(X, y, gene_order, params):
             val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=True, num_workers=1)
 
             # Create the autoencoder
-            autoencoder = DeepDAE(noise_factor, noise_type, dropout_factor, device, gene_order, pathway_proportion, split=True)
+            autoencoder = DeepDAE(noise_factor, noise_type, dropout_rate, device, gene_order, pathway_proportion, split=True)
 
             # Train the autoencoder
             print("Training...")
