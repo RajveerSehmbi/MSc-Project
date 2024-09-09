@@ -141,6 +141,14 @@ def cross_val(X, y, gene_order, params):
         learning_rate = params['params_learning_rate'].iloc[i]
         patience = params['params_patience'].iloc[i]
 
+        # Ensure correct data type
+        pathway_proportion = float(pathway_proportion)
+        noise_factor = float(noise_factor)
+        dropout_rate = float(dropout_rate)
+        batch_size = int(batch_size)
+        learning_rate = float(learning_rate)
+        patience = int(patience)
+
         # Accuracies
         accuracies = []
 
