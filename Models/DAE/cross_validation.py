@@ -130,16 +130,16 @@ def cross_val(X, y, gene_order, params):
         noise_type = None
         pathway_proportion = None
         if variables.DAE_type == 'standard':
-            noise_type = params['noise_type'].iloc[i]
+            noise_type = params['params_noise_type'].iloc[i]
             pathway_proportion = 0.1 # Not used in standard DAE
         elif variables.DAE_type == 'pathway':
             noise_type = 'pathway'
-            pathway_proportion = params['pathway_proportion'].iloc[i]
-        noise_factor = params['noise_factor'].iloc[i]
-        dropout_factor = params['dropout_factor'].iloc[i]
-        batch_size = params['batch_size'].iloc[i]
-        learning_rate = params['learning_rate'].iloc[i]
-        patience = params['patience'].iloc[i]
+            pathway_proportion = params['params_pathway_proportion'].iloc[i]
+        noise_factor = params['params_noise_factor'].iloc[i]
+        dropout_factor = params['params_dropout_factor'].iloc[i]
+        batch_size = params['params_batch_size'].iloc[i]
+        learning_rate = params['params_learning_rate'].iloc[i]
+        patience = params['params_patience'].iloc[i]
 
         # Accuracies
         accuracies = []
