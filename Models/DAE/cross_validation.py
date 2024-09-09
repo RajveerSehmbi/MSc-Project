@@ -136,7 +136,7 @@ def cross_val(X, y, gene_order, params):
             noise_type = 'pathway'
             pathway_proportion = params['params_pathway_proportion'].iloc[i]
         noise_factor = params['params_noise_factor'].iloc[i]
-        dropout_factor = params['params_dropout_factor'].iloc[i]
+        dropout_rate = params['params_dropout_rate'].iloc[i]
         batch_size = params['params_batch_size'].iloc[i]
         learning_rate = params['params_learning_rate'].iloc[i]
         patience = params['params_patience'].iloc[i]
