@@ -118,6 +118,8 @@ def calculate_val_loss(autoencoder, device, val_loader):
 
 def cross_val(X, y, gene_order, params):
 
+    print(params)
+    
     # Accuracies
     cv_accuracies = []
 
