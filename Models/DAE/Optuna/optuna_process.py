@@ -27,13 +27,13 @@ optuna.visualization.plot_slice(study).write_image(f'{variables.image_path}/deep
 study = joblib.load('PWdeepDAE_optuna.pkl')
 df = study.trials_dataframe().drop(['state','datetime_start','datetime_complete'], axis=1)
 
-df.to_csv('PWdeepSDAE_optuna.csv', index=False)
+df.to_csv('PWdeepDAE_optuna.csv', index=False)
 print("Optuna study saved.")
 
 # Save the top three trials in deepDAE_top3_params.csv, lowest loss first
 df = df.sort_values('value', ascending=True)
 df = df.head(3)
-df.to_csv('PWdeepSDAE_top3_params.csv', index=False)
+df.to_csv('PWdeepDAE_top3_params.csv', index=False)
 print("Top 3 params saved.")
 
 # Visualize the study.
