@@ -29,7 +29,7 @@ def train(autoencoder, device, train_loader, val_loader, learning_rate, patience
     # Optimizer
     optimizer = optim.Adam(autoencoder.parameters(), learning_rate)
     # Early stopping
-    early_stopping = EarlyStoppingAE(patience=patience, delta=0.003)
+    early_stopping = EarlyStoppingAE(patience=patience, delta=0.01)
 
     # Losses
     train_losses = []
