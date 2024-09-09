@@ -214,14 +214,11 @@ def main():
     print("Gene order created.")
 
 
-    study = None
     top3_params = None
     
     if variables.DAE_type == 'standard':
-        study = joblib.load(f'{variables.optuna_path}/deepDAE_optuna.pkl')
         top3_params = pd.read_csv(f"{variables.optuna_path}/deepDAE_top3_params.csv")
     elif variables.DAE_type == 'pathway':
-        study = joblib.load(f'{variables.optuna_path}/PWdeepDAE_optuna.pkl')
         top3_params = pd.read_csv(f"{variables.optuna_path}/PWdeepDAE_top3_params.csv")
 
     print("Optuna study loaded.")
