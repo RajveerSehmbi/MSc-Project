@@ -23,6 +23,8 @@ optuna.visualization.plot_optimization_history(study).write_image(f'{variables.i
 optuna.visualization.plot_param_importances(study).write_image(f'{variables.image_path}/deepDAE_optuna_importance.png')
 optuna.visualization.plot_slice(study).write_image(f'{variables.image_path}/deepDAE_optuna_slice.png')
 
+print("Visualizations saved.")
+
 
 study = joblib.load('PWdeepDAE_optuna.pkl')
 df = study.trials_dataframe().drop(['state','datetime_start','datetime_complete'], axis=1)
@@ -40,3 +42,5 @@ print("Top 3 params saved.")
 optuna.visualization.plot_optimization_history(study).write_image(f'{variables.image_path}/PWdeepDAE_optuna_history.png')
 optuna.visualization.plot_param_importances(study).write_image(f'{variables.image_path}/PWdeepDAE_optuna_importance.png')
 optuna.visualization.plot_slice(study).write_image(f'{variables.image_path}/PWdeepDAE_optuna_slice.png')
+
+print("Visualizations saved.")
