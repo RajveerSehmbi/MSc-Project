@@ -125,6 +125,8 @@ def cross_val(X, y, gene_order, params):
 
     for i in range(0, 3):
 
+        print(f"Param set {i}")
+
         # Hyperparameters, taken from params dataframe for the ith row
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         noise_type = None
@@ -172,7 +174,6 @@ def cross_val(X, y, gene_order, params):
 
             # Train the autoencoder
             print("Training...")
-            print(f"Batch size: {batch_size}, pathway proportion: {pathway_proportion}, noise type: {noise_type}, noise factor: {noise_factor}, dropout rate: {dropout_factor}, learning rate: {learning_rate}, patience: {patience}")
             autoencoder, tl, el = train(autoencoder, device, train_loader, val_loader, learning_rate, patience)
             print("Autoencoder trained.")
 
