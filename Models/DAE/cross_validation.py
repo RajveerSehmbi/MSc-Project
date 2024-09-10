@@ -200,7 +200,7 @@ def cross_val(X, y, gene_order, params):
         pd.DataFrame(params).to_csv(f"{variables.optuna_path}/PWdeepDAE_cvparams.csv", index=False)
 
     # Return the index of the best accuracy
-    return np.argmax(cv_accuracies)
+    return np.argmin(cv_accuracies)
 
 
 
