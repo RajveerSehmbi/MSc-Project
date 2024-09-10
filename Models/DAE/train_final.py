@@ -171,10 +171,10 @@ def three_fold_test(X, y, testX, testy, gene_order, params, model_type):
         autoencoder, tl, el = train(autoencoder, device, train_loader, val_loader, learning_rate, patience)
 
         if random_states[i] == 42:
-            # Save the model
-            torch.save(autoencoder.state_dict(), f"{variables.DAE_model_path}/DAE_{model_type}.pt")
-
-            print("Model saved.")
+            # Save encoder and decoder separately
+            torch.save(autoencoder.encoder.state_dict(), f"{variables.DAE_model_path}/DAE_encoder_{model_type}.pt")
+            torch.save(autoencoder.decoder.state_dict(), f"{variables.DAE_model_path}/DAE_decoder_{model_type}.pt")
+            print("Encoder and decoder saved.")
 
             # Save the losses
             losses = pd.DataFrame({'train': tl, 'es': el})
