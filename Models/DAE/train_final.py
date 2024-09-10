@@ -92,7 +92,7 @@ def train(autoencoder, device, train_loader, val_loader, learning_rate, patience
 
 
 
-def calculate_loss(autoencoder, device, loader):
+def calculate_loss(autoencoder, loader, device):
     
         loss_function = nn.MSELoss()
         total_loss = 0.0
@@ -121,16 +121,16 @@ def three_fold_test(X, y, testX, testy, gene_order, params, model_type):
     noise_type = None
     pathway_proportion = None
     if variables.DAE_type == 'standard':
-        noise_type = params['params_noise_type']
+        noise_type = params['params_noise_type'].iloc[0]
         pathway_proportion = 0.1 # Not used in standard DAE
     elif variables.DAE_type == 'pathway':
         noise_type = 'pathway'
-        pathway_proportion = params['params_pathway_proportion']
-    noise_factor = params['params_noise_factor']
-    dropout_rate = params['params_dropout_rate']
-    batch_size = params['params_batch_size']
-    learning_rate = params['params_learning_rate']
-    patience = params['params_patience']
+        pathway_proportion = params['params_pathway_proportion'].iloc[0]
+    noise_factor = params['params_noise_factor'].iloc[0]
+    dropout_rate = params['params_dropout_rate'].iloc[0]
+    batch_size = params['params_batch_size'].iloc[0]
+    learning_rate = params['params_learning_rate'].iloc[0]
+    patience = params['params_patience'].iloc[0]
 
     # Ensure correct data type
     pathway_proportion = float(pathway_proportion)
