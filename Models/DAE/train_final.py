@@ -177,8 +177,8 @@ def three_fold_test(X, y, testX, testy, gene_order, params, model_type):
             print("Encoder and decoder saved.")
 
             # Save the losses
-            losses = pd.DataFrame({'train': tl, 'es': el})
-            losses.to_csv(f"{variables.DAE_model_path}/DAE_losses_{model_type}.csv")
+            training_losses = pd.DataFrame({'train': tl, 'es': el})
+            training_losses.to_csv(f"{variables.DAE_model_path}/DAE_losses_{model_type}.csv")
 
             print("Losses saved.")
 
