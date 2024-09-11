@@ -180,9 +180,9 @@ class TrainedEncoder(nn.Module):
         self.dropout_factor = dropout_factor
 
         # Define the layers exactly like the original encoder, but no extra logic
-        self.layer0 = self.generate_layer(input_dim, layer1_dim, dropout_factor)
-        self.layer1 = self.generate_layer(layer1_dim, layer2_dim, dropout_factor)
-        self.layer2 = self.generate_layer(layer2_dim, output_dim, dropout_factor)
+        self.layer0 = self.generate_layer(input_dim, layer1_dim)
+        self.layer1 = self.generate_layer(layer1_dim, layer2_dim)
+        self.layer2 = self.generate_layer(layer2_dim, output_dim)
 
         self.layers = nn.ModuleList([self.layer0, self.layer1, self.layer2])
 
