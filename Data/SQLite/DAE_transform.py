@@ -27,12 +27,12 @@ def save_data(engine, table_name, data):
     count = 0
     row_num = data.shape[0]
     for i in range(0, data.shape[1], 999):
-        table_name = f"{table_name}_{count}"
+        sql_table = f"{table_name}_{count}"
         subset = data.iloc[:, i:i+999].copy()
         subset['row_num'] = range(0, row_num)
-        subset.to_sql(table_name, engine, if_exists="replace", index=False, index_label='row_num')
+        subset.to_sql(sql_table, engine, if_exists="replace", index=False, index_label='row_num')
         count += 1
-        print(f"Loop {count} completed for {table_name}")
+        print(f"Loop {count} completed for {sql_table}")
 
     print(f"All data saved for {table_name}")
 
