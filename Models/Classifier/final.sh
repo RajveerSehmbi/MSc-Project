@@ -4,4 +4,4 @@ export PATH=/vol/bitbucket/rs218/fullenv/bin/:$PATH
 
 source activate
 
-python train_final.py train
+python train_final.py trainPWdeepDAEtransformed

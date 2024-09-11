@@ -217,7 +217,7 @@ def main(table_name):
     # Input dimension
     input_dim = None
     table_num = None
-    if table_name == 'trainPCAtransform' or table_name == 'trainKPCAtransform':
+    if table_name == 'trainPCAtransform' or table_name == 'trainKPCAtransform' or table_name == 'trainPWdeepDAEtransformed':
         input_dim = variables.PCA_components
         table_num = 4
         if table_name == 'trainPCAtransform':
@@ -226,6 +226,9 @@ def main(table_name):
         elif table_name == 'trainKPCAtransform':
             test_table_name = 'testKPCAtransform'
             data_type = 'KPCA'
+        elif table_name == 'trainPWdeepDAEtransformed':
+            test_table_name = 'testPWdeepDAEtransformed'
+            data_type = 'PWdeepDAE'
     elif table_name == 'train':
         input_dim = variables.gene_number
         table_num = 46
