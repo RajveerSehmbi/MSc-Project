@@ -3,7 +3,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=rs218
-#SBATCH --output=final%j.out
+#SBATCH --output=dae%j.out
 
 export PATH=/vol/bitbucket/${USER}/fullenv/bin/:$PATH
 
