@@ -170,3 +170,31 @@ class DeepDAE(nn.Module):
 
     def encode(self, x):
         return self.encoder.val_forward(x)
+    
+
+
+
+class TrainedEncoder(nn.Module):
+    def __init__(self, dropout_factor):
+        super().__init__()
+        self.dropout_factor = dropout_factor
+
+        # Define the layers exactly like the original encoder, but no extra logic
+        self.layer0 = self.generate_layer(input_dim, layer1_dim, dropout_factor)
+        self.layer1 = self.generate_layer(layer1_dim, layer2_dim, dropout_factor)
+        self.layer2 = self.generate_layer(layer2_dim, output_dim, dropout_factor)
+
+        self.layers = nn.ModuleList([self.layer0, self.layer1, self.layer2])
+
+    def generate_layer(self, first_dim, second_dim):
+        layer = nn.Sequential(
+            nn.Linear(first_dim, second_dim),
+            nn.ReLU(),
+            nn.Dropout(self.dropout_factor)
+        )
+        return layer
+    
+    def forward(self, x):
+        for i in range(0,3):
+            x = self.layers[i](x)
+        return x
