@@ -82,24 +82,30 @@ class Encoder(nn.Module):
         elif self.noise_type == 'not_pathway':
             # Select all pathways
             pathways = self.pathways['pathway']
-            
+
+            all_indices = []
+
+            for pathway in pathways:
+                # Precompute all indices for the pathway genes in input layer
+                indices = [self.input_order.index(gene) for gene in self.pathways[self.pathways['pathway'] == pathway]['gene'].values[0]]
+                all_indices.extend(indices)
+
+            all_indices = torch.tensor(all_indices, dtype=torch.long, device=self.device)
+            all_indices = torch.unique(all_indices)
+
             perturbed_x = x.clone()
 
-            # If i == 0, add noise to the first layer
-            for pathway in pathways:
-                indices = [self.input_order.index(gene) for gene in self.pathways[self.pathways['pathway'] == pathway]['gene'].values[0]]
-                indices = torch.tensor(indices, dtype=torch.long)
+            if i == 0:
+                perturbed_x = self.inverse_perturb(perturbed_x, all_indices)
+            else:
+                j = 1
+                while j <= i:
+                    weights = self.layers[j-1][0].weight.T[all_indices]
+                    all_indices = torch.argmax(weights, dim=1)
+                    all_indices = indices.to(self.device)
+                    j += 1
+                perturbed_x = self.inverse_perturb(perturbed_x, all_indices)
 
-                if i == 0:
-                    perturbed_x = self.inverse_perturb(perturbed_x, indices)
-                else:
-                    j = 1
-                    while j <= i:
-                        weights = self.layers[j-1][0].weight.T[indices]
-                        indices = torch.argmax(weights, dim=1)
-                        indices = indices.to(self.device)
-                        j += 1
-                    perturbed_x = self.inverse_perturb(perturbed_x, indices)
             return perturbed_x
 
 
