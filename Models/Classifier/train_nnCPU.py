@@ -184,7 +184,7 @@ def main(table_name):
     # Input dimension
     input_dim = None
     table_num = None
-    if table_name == 'trainPCAtransform' or table_name == 'trainPWdeepDAEtransformed' or table_name == 'trainKPCAtransform':
+    if table_name == 'trainPCAtransform' or table_name == 'trainPWdeepDAEtransformed' or table_name == 'trainKPCAtransform' or table_name == 'traindeepDAEtransformed':
         input_dim = variables.PCA_components
         table_num = 4
     elif table_name == 'train':
