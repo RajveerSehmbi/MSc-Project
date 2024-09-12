@@ -10,6 +10,7 @@ input_dim = variables.gene_number
 layer1_dim = 8192
 layer2_dim = 4096
 output_dim = variables.PCA_components
+inverse = variables.inverse
 
 
 class Encoder(nn.Module):
@@ -78,20 +79,74 @@ class Encoder(nn.Module):
                         j += 1
                     perturbed_x = self.perturb(perturbed_x, indices)
             return perturbed_x
+        elif self.noise_type == 'not_pathway':
+            # Select all pathways
+            pathways = self.pathways['pathway']
+            
+            perturbed_x = x.clone()
+
+            # If i == 0, add noise to the first layer
+            for pathway in pathways:
+                indices = [self.input_order.index(gene) for gene in self.pathways[self.pathways['pathway'] == pathway]['gene'].values[0]]
+                indices = torch.tensor(indices, dtype=torch.long)
+
+                if i == 0:
+                    perturbed_x = self.inverse_perturb(perturbed_x, indices)
+                else:
+                    j = 1
+                    while j <= i:
+                        weights = self.layers[j-1][0].weight.T[indices]
+                        indices = torch.argmax(weights, dim=1)
+                        indices = indices.to(self.device)
+                        j += 1
+                    perturbed_x = self.inverse_perturb(perturbed_x, indices)
+            return perturbed_x
 
 
 
     def perturb(self, x, indices):
         x_copy = x.clone().T
-        modes = ['over', 'under', 'mask']
-        random_mode = modes[torch.randint(0, 3, (1,)).item()]
+        modes = ['over', 'under']
+        random_mode = modes[torch.randint(0, 2, (1,)).item()]
 
+        if not inverse:
+            if random_mode == 'over':
+                x_copy[indices] *= (1 + self.noiserate)
+            elif random_mode == 'under':
+                x_copy[indices] *= (1 - self.noiserate)
+            return x_copy.T
+        else:
+            mask = torch.ones(x_copy.size(0), dtype=torch.bool, device=x_copy.device)
+            mask[indices] = False
+            if random_mode == 'over':
+                # All values except the indices are multiplied by 1 + noiserate
+                x_copy[mask] *= (1 + self.noiserate)
+            elif random_mode == 'under':
+                x_copy[mask] *= (1 - self.noiserate)
+            return x_copy.T
+        
+    def inverse_perturb(self, x, indices):
+        x_copy = x.clone().T
+
+        mask = torch.ones(x_copy.size(0), dtype=torch.bool, device=x_copy.device)
+        mask[indices] = False
+
+        # Under-expressing all genes except those in the pathway
+        x_copy[mask] *= (1 - self.noiserate)
+
+        # Adding a small gaussian noise to all genes for natural variation
+        noise = torch.randn(x.size()) * (self.noiserate / 2)
+        noise = noise.to(self.device)
+        x_copy += noise
+
+        # Mimicking a random batch effect
+        modes = ['over', 'under']
+        random_mode = modes[torch.randint(0, 2, (1,)).item()]
         if random_mode == 'over':
-            x_copy[indices] *= (1 + self.noiserate)
+            x_copy += 0.1
         elif random_mode == 'under':
-            x_copy[indices] *= (1 - self.noiserate)
-        elif random_mode == 'mask':
-            x_copy[indices] = 0
+            x_copy -= 0.1
+
         return x_copy.T
 
 
@@ -99,7 +154,7 @@ class Encoder(nn.Module):
     def generate_layer(self, first_dim, second_dim):
         layer = nn.Sequential(
             nn.Linear(first_dim, second_dim),
-            nn.ReLU(),
+            nn.ELU(),
             nn.Dropout(self.dropout_factor)
         )
         # Initialize weights
@@ -116,10 +171,10 @@ class Decoder(nn.Module):
         # generate list of decoders
         self.decoders = nn.Sequential(
             nn.Linear(output_dim, layer2_dim),
-            nn.ReLU(),
+            nn.ELU(),
             nn.Dropout(dropout_factor),
             nn.Linear(layer2_dim, layer1_dim),
-            nn.ReLU(),
+            nn.ELU(),
             nn.Dropout(dropout_factor),
             nn.Linear(layer1_dim, input_dim))
 
