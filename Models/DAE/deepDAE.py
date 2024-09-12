@@ -112,24 +112,17 @@ class Encoder(nn.Module):
 
     def perturb(self, x, indices):
         x_copy = x.clone().T
-        modes = ['over', 'under']
-        random_mode = modes[torch.randint(0, 2, (1,)).item()]
+        modes = ['over', 'under', 'mask']
+        random_mode = modes[torch.randint(0, 3, (1,)).item()]
 
-        if not inverse:
-            if random_mode == 'over':
-                x_copy[indices] *= (1 + self.noiserate)
-            elif random_mode == 'under':
-                x_copy[indices] *= (1 - self.noiserate)
-            return x_copy.T
-        else:
-            mask = torch.ones(x_copy.size(0), dtype=torch.bool, device=x_copy.device)
-            mask[indices] = False
-            if random_mode == 'over':
-                # All values except the indices are multiplied by 1 + noiserate
-                x_copy[mask] *= (1 + self.noiserate)
-            elif random_mode == 'under':
-                x_copy[mask] *= (1 - self.noiserate)
-            return x_copy.T
+
+        if random_mode == 'over':
+            x_copy[indices] *= (1 + self.noiserate)
+        elif random_mode == 'under':
+            x_copy[indices] *= (1 - self.noiserate)
+        elif random_mode == 'mask':
+            x_copy[indices] = 0
+        return x_copy.T
         
     def inverse_perturb(self, x, indices):
         x_copy = x.clone().T
@@ -143,15 +136,16 @@ class Encoder(nn.Module):
         # Adding a small gaussian noise to all genes for natural variation
         noise = torch.randn(x_copy.size()) * (self.noiserate / 2)
         noise = noise.to(self.device)
-        x_copy += noise
 
-        # Mimicking a random batch effect
+        # Mimicking a random batch effect noise
         modes = ['over', 'under']
         random_mode = modes[torch.randint(0, 2, (1,)).item()]
         if random_mode == 'over':
-            x_copy += 0.1
+            noise += 0.1
         elif random_mode == 'under':
-            x_copy -= 0.1
+            noise -= 0.1
+
+        x_copy += noise
 
         return x_copy.T
 
