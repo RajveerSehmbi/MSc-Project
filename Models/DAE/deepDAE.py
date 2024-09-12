@@ -83,15 +83,14 @@ class Encoder(nn.Module):
             # Select all pathways
             pathways = self.pathways['pathway']
 
-            all_indices = []
+            all_indices = set()
 
             for pathway in pathways:
                 # Precompute all indices for the pathway genes in input layer
                 indices = [self.input_order.index(gene) for gene in self.pathways[self.pathways['pathway'] == pathway]['gene'].values[0]]
-                all_indices.extend(indices)
+                all_indices.update(indices)
 
-            all_indices = torch.tensor(all_indices, dtype=torch.long, device=self.device)
-            all_indices = torch.unique(all_indices)
+            all_indices = torch.tensor(list(all_indices), dtype=torch.long, device=self.device)
 
             perturbed_x = x.clone()
 
