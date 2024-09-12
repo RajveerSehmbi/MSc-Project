@@ -112,12 +112,16 @@ def full_train(trial, train_set, val_set, gene_order, DAE_type):
     # Hyperparameters
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     noise_type = None
+    pathway_proportion = None
     if DAE_type == 'standard':
         noise_type = trial.suggest_categorical('noise_type', ['gaussian', 'masking'])
         pathway_proportion = 0.1 # Not used
     elif DAE_type == 'pathway':
         noise_type = 'pathway'
         pathway_proportion = trial.suggest_float('pathway_proportion', 0.0, 1.0, step=0.1)
+    elif DAE_type == 'not_pathway':
+        noise_type = 'not_pathway'
+        pathway_proportion = 1 # Not used
     noise_factor = trial.suggest_float('noise_factor', 0.1, 0.5, step=0.1)
     dropout_rate = trial.suggest_float('dropout_rate', 0.0, 0.5, step=0.1)
     batch_size = trial.suggest_categorical('batch_size', [16, 32, 64, 128, 256, 512])
@@ -201,7 +205,9 @@ def main():
     if variables.DAE_type == 'standard':
         joblib.dump(study, f'{variables.optuna_path}/deepDAE_optuna.pkl')
     elif variables.DAE_type == 'pathway':
-        joblib.dump(study, f'{variables.optuna_path}/PWdeepSDAE_optuna.pkl')
+        joblib.dump(study, f'{variables.optuna_path}/PWdeepDAE_optuna.pkl')
+    elif variables.DAE_type == 'not_pathway':
+        joblib.dump(study, f'{variables.optuna_path}/notPWdeepDAE_optuna.pkl')
 
     print("Optuna study saved.")
 

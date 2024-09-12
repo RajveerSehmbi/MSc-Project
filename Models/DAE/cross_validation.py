@@ -137,6 +137,9 @@ def cross_val(X, y, gene_order, params):
         elif variables.DAE_type == 'pathway':
             noise_type = 'pathway'
             pathway_proportion = params['params_pathway_proportion'].iloc[i]
+        elif variables.DAE_type == 'not_pathway':
+            noise_type = 'not_pathway'
+            pathway_proportion = 1 # Not used
         noise_factor = params['params_noise_factor'].iloc[i]
         dropout_rate = params['params_dropout_rate'].iloc[i]
         batch_size = params['params_batch_size'].iloc[i]
@@ -198,6 +201,8 @@ def cross_val(X, y, gene_order, params):
         pd.DataFrame(params).to_csv(f"{variables.optuna_path}/deepDAE_cvparams.csv", index=False)
     elif variables.DAE_type == 'pathway':
         pd.DataFrame(params).to_csv(f"{variables.optuna_path}/PWdeepDAE_cvparams.csv", index=False)
+    elif variables.DAE_type == 'not_pathway':
+        pd.DataFrame(params).to_csv(f"{variables.optuna_path}/notPWdeepDAE_cvparams.csv", index=False)
 
     # Return the index of the best accuracy
     return np.argmin(cv_accuracies)
@@ -237,6 +242,9 @@ def main():
         top3_params = pd.read_csv(f"{variables.optuna_path}/deepDAE_top3_params.csv")
     elif variables.DAE_type == 'pathway':
         top3_params = pd.read_csv(f"{variables.optuna_path}/PWdeepDAE_top3_params.csv")
+    elif variables.DAE_type == 'not_pathway':
+        top3_params = pd.read_csv(f"{variables.optuna_path}/notPWdeepDAE_top3_params.csv")
+    
 
     print("Optuna study loaded.")
 
@@ -256,6 +264,8 @@ def main():
         pd.DataFrame(best_params, index=[0]).to_csv(f"{variables.optuna_path}/deepDAE_best_params.csv", index=False)
     elif variables.DAE_type == 'pathway':
         pd.DataFrame(best_params, index=[0]).to_csv(f"{variables.optuna_path}/PWdeepDAE_best_params.csv", index=False)
+    elif variables.DAE_type == 'not_pathway':
+        pd.DataFrame(best_params, index=[0]).to_csv(f"{variables.optuna_path}/notPWdeepDAE_best_params.csv", index=False)
 
 
 
