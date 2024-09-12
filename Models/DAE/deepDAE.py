@@ -154,7 +154,7 @@ class Encoder(nn.Module):
     def generate_layer(self, first_dim, second_dim):
         layer = nn.Sequential(
             nn.Linear(first_dim, second_dim),
-            nn.ELU(),
+            nn.ReLU(),
             nn.Dropout(self.dropout_factor)
         )
         # Initialize weights
@@ -171,10 +171,10 @@ class Decoder(nn.Module):
         # generate list of decoders
         self.decoders = nn.Sequential(
             nn.Linear(output_dim, layer2_dim),
-            nn.ELU(),
+            nn.ReLU(),
             nn.Dropout(dropout_factor),
             nn.Linear(layer2_dim, layer1_dim),
-            nn.ELU(),
+            nn.ReLU(),
             nn.Dropout(dropout_factor),
             nn.Linear(layer1_dim, input_dim))
 
