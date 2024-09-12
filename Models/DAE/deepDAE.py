@@ -135,7 +135,7 @@ class Encoder(nn.Module):
         x_copy[mask] *= (1 - self.noiserate)
 
         # Adding a small gaussian noise to all genes for natural variation
-        noise = torch.randn(x.size()) * (self.noiserate / 2)
+        noise = torch.randn(x_copy.size()) * (self.noiserate / 2)
         noise = noise.to(self.device)
         x_copy += noise
 
