@@ -133,7 +133,7 @@ def full_train(trial, train_set, val_set, gene_order, DAE_type):
     val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=True, num_workers=1)
 
     # Create the autoencoder
-    autoencoder = DeepDAE(noise_factor, noise_type, dropout_rate, device, gene_order, pathway_proportion, split=False)
+    autoencoder = DeepDAE(noise_factor, noise_type, dropout_rate, device, gene_order, pathway_proportion, split=False).to(device)
 
     # Train the autoencoder
     print("Training...")
