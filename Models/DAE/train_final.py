@@ -126,6 +126,9 @@ def three_fold_test(X, y, testX, testy, gene_order, params, model_type):
     elif variables.DAE_type == 'pathway':
         noise_type = 'pathway'
         pathway_proportion = params['params_pathway_proportion'].iloc[0]
+    elif variables.DAE_type == 'not_pathway':
+        noise_type = 'not_pathway'
+        pathway_proportion = 1 # Not used in not_pathway DAE
     noise_factor = params['params_noise_factor'].iloc[0]
     dropout_rate = params['params_dropout_rate'].iloc[0]
     batch_size = params['params_batch_size'].iloc[0]
@@ -147,9 +150,10 @@ def three_fold_test(X, y, testX, testy, gene_order, params, model_type):
     test_ds = FE_Dataset(testX, testy)
     test_loader = DataLoader(test_ds, batch_size=batch_size, num_workers=1)
 
-    random_states = [42, 43, 44]
+    #random_states = [42, 43, 44]
+    random_states = [42]
 
-    for i in range(0, 3):
+    for i in range(0, len(random_states)):
         print(f"Fold {i}")
 
         # Split the data
@@ -243,6 +247,8 @@ def main():
         best_params = pd.read_csv(f"{variables.optuna_path}/deepDAE_best_params.csv")
     elif variables.DAE_type == 'pathway':
         best_params = pd.read_csv(f"{variables.optuna_path}/PWdeepDAE_best_params.csv")
+    elif variables.DAE_type == 'not_pathway':
+        best_params = pd.read_csv(f"{variables.optuna_path}/notPWdeepDAE_best_params.csv")
 
     print("Best params loaded.")
 
@@ -254,6 +260,8 @@ def main():
         type = 'deepDAE'
     elif variables.DAE_type == 'pathway':
         type = 'PWdeepDAE'
+    elif variables.DAE_type == 'not_pathway':
+        type = 'notPWdeepDAE'
 
     loss = three_fold_test(X, y, testX, testy, gene_order, best_params, type)
 
