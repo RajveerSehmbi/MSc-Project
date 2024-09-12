@@ -66,6 +66,7 @@ def main():
     model_type = None
     params = None
     if variables.DAE_type == 'standard':
+        model_type = 'deepDAE'
         params = pd.read_csv(f"{variables.optuna_path}/deepDAE_best_params.csv")
     elif variables.DAE_type == 'pathway':
         model_type = 'PWdeepDAE'
