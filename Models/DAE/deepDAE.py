@@ -9,8 +9,7 @@ import variables
 input_dim = variables.gene_number
 layer1_dim = 8192
 layer2_dim = 4096
-output_dim = variables.PCA_components
-inverse = variables.inverse
+output_dim = 2
 
 
 class Encoder(nn.Module):
