@@ -9,7 +9,7 @@ import variables
 input_dim = variables.gene_number
 layer1_dim = 8192
 layer2_dim = 4096
-output_dim = 2
+output_dim = variables.PCA_components
 
 
 class Encoder(nn.Module):
@@ -195,10 +195,10 @@ class DeepDAE(nn.Module):
         self.encoder = Encoder(noiserate, noise_type, dropout_factor, device, input_order, pathway_proportion)
         self.decoder = Decoder(dropout_factor)
         
-        # tie weights
-        self.decoder.decoders[0].weight = nn.Parameter(self.encoder.layers[2][0].weight.t())
-        self.decoder.decoders[3].weight = nn.Parameter(self.encoder.layers[1][0].weight.t())
-        self.decoder.decoders[6].weight = nn.Parameter(self.encoder.layers[0][0].weight.t())
+        # # tie weights
+        # self.decoder.decoders[0].weight = nn.Parameter(self.encoder.layers[2][0].weight.t())
+        # self.decoder.decoders[3].weight = nn.Parameter(self.encoder.layers[1][0].weight.t())
+        # self.decoder.decoders[6].weight = nn.Parameter(self.encoder.layers[0][0].weight.t())
 
         if split:
             self.encoder.to('cuda:0')

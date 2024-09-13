@@ -200,9 +200,9 @@ def main():
     study.optimize(lambda trial: full_train(trial, train_set, val_set, gene_order, variables.DAE_type), n_trials=15)
 
     if variables.DAE_type == 'standard':
-        joblib.dump(study, f'{variables.optuna_path}/2DdeepDAE_optuna.pkl')
+        joblib.dump(study, f'{variables.optuna_path}/NTdeepDAE_optuna.pkl')
     elif variables.DAE_type == 'pathway':
-        joblib.dump(study, f'{variables.optuna_path}/2DPWdeepDAE_optuna.pkl')
+        joblib.dump(study, f'{variables.optuna_path}/NTPWdeepDAE_optuna.pkl')
 
     print("Optuna study saved.")
 
