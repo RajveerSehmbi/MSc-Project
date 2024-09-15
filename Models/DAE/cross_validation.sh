@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpgpuC
-#SBATCH --gres=gpu:2
+#SBATCH --partition=gpgpu
+#SBATCH --gres=gpu:teslaa40:1
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=rs218
 #SBATCH --output=cv%j.out
