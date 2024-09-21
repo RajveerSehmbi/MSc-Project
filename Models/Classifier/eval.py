@@ -61,10 +61,10 @@ def evaluate(classifier, loader, data_type):
 
 # Dictionary of all models
 models = {
-    "PCA": {"table_name": "testPCAtransform", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.4},
-    "KPCA": {"table_name": "testKPCAtransform", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.3},
-    "PWdeepDAE": {"table_name": "testPWdeepDAEtransformed", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.4},
-    "deepDAE": {"table_name": "testdeepDAEtransformed", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.0},
+    # "PCA": {"table_name": "testPCAtransform", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.4},
+    # "KPCA": {"table_name": "testKPCAtransform", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.3},
+    # "PWdeepDAE": {"table_name": "testPWdeepDAEtransformed", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.4},
+    # "deepDAE": {"table_name": "testdeepDAEtransformed", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.0},
     "base": {"table_name": "test", "input_dim": variables.gene_number, "table_num": 46, "dropout": 0.3},
 }
 
@@ -99,7 +99,7 @@ for data_type, data in models.items():
 
     # Load the model
     model = Classifier(input_dim=input_dim, hidden_dim=variables.pathway_num, dropout_factor=dropout)
-    model.load_state_dict(torch.load(f"{variables.classifier_model_path}/classifier_{data_type}.pt"))
+    model.load_state_dict(torch.load(f"{variables.classifier_model_path}/classifier_{data_type}.pt"), map_location=torch.device('cpu'))
 
     print(f"Model loaded: {data_type}")
 
