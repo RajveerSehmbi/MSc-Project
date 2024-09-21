@@ -49,10 +49,16 @@ def evaluate(classifier, loader, data_type):
     recall = recall_score(true_labels, predictions, average='weighted')  # or 'macro'
     f1 = f1_score(true_labels, predictions, average='weighted')  # or 'macro'
 
+    # Convert to a DataFrame for better formatting
+    cm_df = pd.DataFrame(conf_matrix, index=['True ' + str(i) for i in range(conf_matrix.shape[0])],
+                        columns=['Pred ' + str(i) for i in range(conf_matrix.shape[1])])
+
+    # Save to CSV without truncation
+    cm_df.to_csv(f'{data_type}_confusion_matrix.csv', index=True)
+
     # Save all metrics into a file
     with open(f"{variables.classifier_model_path}/{data_type}_metrics.txt", "a") as f:
         f.write(f"Balanced accuracy: {balanced_accuracy}\n")
-        f.write(f"Confusion matrix: {conf_matrix}\n")
         f.write(f"Precision: {precision}\n")
         f.write(f"Recall: {recall}\n")
         f.write(f"F1: {f1}\n")
@@ -61,10 +67,10 @@ def evaluate(classifier, loader, data_type):
 
 # Dictionary of all models
 models = {
-    # "PCA": {"table_name": "testPCAtransform", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.4},
-    # "KPCA": {"table_name": "testKPCAtransform", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.3},
-    # "PWdeepDAE": {"table_name": "testPWdeepDAEtransformed", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.4},
-    # "deepDAE": {"table_name": "testdeepDAEtransformed", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.0},
+    "PCA": {"table_name": "testPCAtransform", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.4},
+    "KPCA": {"table_name": "testKPCAtransform", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.3},
+    "PWdeepDAE": {"table_name": "testPWdeepDAEtransformed", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.4},
+    "deepDAE": {"table_name": "testdeepDAEtransformed", "input_dim": variables.PCA_components, "table_num": 4, "dropout": 0.0},
     "base": {"table_name": "test", "input_dim": variables.gene_number, "table_num": 46, "dropout": 0.3},
 }
 
@@ -79,6 +85,10 @@ for data_type, data in models.items():
     input_dim = data["input_dim"]
     table_num = data["table_num"]
     dropout = data["dropout"]
+
+    device = 'cpu'
+    if data_type == "base":
+        device = 'cuda'
 
     # Test data
     testX = pd.DataFrame()
@@ -98,8 +108,8 @@ for data_type, data in models.items():
     test_loader = DataLoader(test_ds, batch_size=512, num_workers=1)
 
     # Load the model
-    model = Classifier(input_dim=input_dim, hidden_dim=variables.pathway_num, dropout_factor=dropout)
-    model.load_state_dict(torch.load(f"{variables.classifier_model_path}/classifier_{data_type}.pt"), map_location=torch.device('cpu'))
+    model = Classifier(input_dim=input_dim, hidden_dim=variables.pathway_num, dropout_factor=dropout).to(device)
+    model.load_state_dict(torch.load(f"{variables.classifier_model_path}/classifier_{data_type}.pt"))
 
     print(f"Model loaded: {data_type}")
 
