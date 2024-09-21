@@ -20,7 +20,7 @@ from sqlalchemy import create_engine
 import joblib
 import variables
 
-def evaluate(classifier, loader, data_type):
+def evaluate(classifier, loader, data_type, device):
 
     # Create true labels
     true_labels = []
@@ -33,6 +33,8 @@ def evaluate(classifier, loader, data_type):
         with torch.no_grad():
             
             true_labels.extend(y.numpy().tolist())
+
+            X = X.to(device)
 
             outputs = classifier(X)
             outputs = outputs.to('cpu')
@@ -117,7 +119,7 @@ for data_type, data in models.items():
     model.eval()
 
     # Predict
-    evaluate(model, test_loader, data_type)
+    evaluate(model, test_loader, data_type, device)
 
     print(f"Metrics saved for {data_type}")
 
