@@ -110,3 +110,6 @@ for data_type, data in models.items():
     evaluate(model, test_loader, data_type)
 
     print(f"Metrics saved for {data_type}")
+
+    del model, test_ds, test_loader, testX, testy
+    gc.collect()
