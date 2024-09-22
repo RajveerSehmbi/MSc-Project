@@ -8,11 +8,9 @@ from sqlalchemy import create_engine
 import variables
 import sys
 
-def main(name):
-    # Create a connection to the database
-    engine = create_engine(f"sqlite:///{variables.database_path}")
+engine = create_engine(f"sqlite:///{variables.database_path}")
 
-    def load_data(table_name):
+def load_data(table_name):
         test = pd.DataFrame()
         for i in range(0, 4):
             table = pd.read_sql(f"SELECT * FROM {table_name}_{i}", engine, index_col='row_num')
@@ -20,9 +18,14 @@ def main(name):
             print(f"Read {table_name}_{i}")
         return test
 
+def main(name):
+
+
     # Load PCA and KPCA data
+    print(f"Loading data for {name}...")
     test_data = load_data(f"test{name}")
     train_data = load_data(f"train{name}")
+    print("Data loaded.")
 
     testX = test_data.drop(columns=['cancer_type'])
     testy = test_data['cancer_type']
@@ -57,6 +60,7 @@ if __name__ == '__main__':
 
     # Pass the name of the experiment as an argument
     name = sys.argv[1]
+    print(f"{name} experiment started.")
     main(name)
 
 
