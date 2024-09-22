@@ -39,7 +39,7 @@ def main(name):
 
     # Step 4: Apply GMM clustering
     num_classes = len(variables.cancer_map)  # Use the length of the cancer map as the number of clusters
-    gmm = GaussianMixture(n_components=num_classes, random_state=42, verbose=2, covariance_type='diag')  # GMM with the number of classes
+    gmm = GaussianMixture(n_components=num_classes, random_state=42, verbose=2, max_iter=500)  # GMM with the number of classes
     gmm.fit(trainX) 
     print("GMM training complete.")
 
