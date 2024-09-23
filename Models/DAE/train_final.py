@@ -252,9 +252,9 @@ def main():
 
     type = None
     if variables.DAE_type == 'standard':
-        type = 'NTdeepDAE'
+        type = 'deepDAE'
     elif variables.DAE_type == 'pathway':
-        type = 'NTPWdeepDAE'
+        type = 'PWdeepDAE'
 
     loss = three_fold_test(X, y, testX, testy, gene_order, best_params, type)
 
