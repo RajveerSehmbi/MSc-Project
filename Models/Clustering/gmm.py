@@ -12,7 +12,7 @@ engine = create_engine(f"sqlite:///{variables.database_path}")
 
 def load_data(table_name):
         test = pd.DataFrame()
-        for i in range(0, 4):
+        for i in range(0, 46):
             table = pd.read_sql(f"SELECT * FROM {table_name}_{i}", engine, index_col='row_num')
             test = pd.concat([test, table], axis=1)
             print(f"Read {table_name}_{i}")
@@ -39,7 +39,7 @@ def main(name):
 
     # Step 4: Apply GMM clustering
     num_classes = len(variables.cancer_map)  # Use the length of the cancer map as the number of clusters
-    gmm = GaussianMixture(n_components=num_classes, random_state=42, verbose=2, max_iter=500)  # GMM with the number of classes
+    gmm = GaussianMixture(n_components=num_classes, random_state=42, verbose=2, max_iter=500, covariance_type='diag')  # GMM with the number of classes
     gmm.fit(trainX) 
     print("GMM training complete.")
 
@@ -60,6 +60,10 @@ if __name__ == '__main__':
 
     # Pass the name of the experiment as an argument
     name = sys.argv[1]
+
+    if name == 'base':
+        name = ''
+
     print(f"{name} experiment started.")
     main(name)
 
