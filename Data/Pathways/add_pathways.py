@@ -3,7 +3,8 @@ import requests
 
 pathway_ids = ['hsa05221', 'hsa05219', 'hsa05224', 'hsa05210', 'hsa05212', 'hsa05225',
                'hsa05226', 'hsa05214', 'hsa05216', 'hsa05220', 'hsa05217', 'hsa05218',
-               'hsa05211', 'hsa05215', 'hsa05213', 'hsa05222', 'hsa05223']
+               'hsa05211', 'hsa05215', 'hsa05213', 'hsa05222', 'hsa05223', 'hsa05206',
+               'hsa05200']
 
 df = pd.DataFrame(columns=['pathway', 'gene'])
 

@@ -121,7 +121,6 @@ test_transformed_pca = test_transformed_pca.iloc[:, :3734]
 test_transformed_pca['cancer_type'] = test_labels
 
 # Save transformed test data PCA
-test_transformed_pca.reset_index(drop=True, inplace=True)
 count = 0
 test_rows = test_transformed_pca.shape[0]
 for i in range(0, test_transformed_pca.shape[1], 999):
