@@ -1,0 +1,2 @@
+number,value,duration,params_batch_size,params_dropout_rate,params_learning_rate,params_noise_factor,params_pathway_proportion,params_patience,cv_accuracy
+13,0.3204373733358584,0 days 07:15:20.674658,128,0.0,0.0001015385512358,0.2,0.5,14,0.3540435696647457
